@@ -127,8 +127,8 @@
             </div>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="cardRegistrationOut"><span class="icon">💳</span>Card Registration Number</label>
-                    <input type="text" id="cardRegistrationOut" name="cardRegistrationOut" required placeholder="Enter card registration number">
+                    <label for="cardRegistrationOut"><span class="icon">💳</span>Vehicle Registration</label>
+                    <input type="text" id="cardRegistrationOut" name="cardRegistrationOut" required placeholder="Enter Vehicle registration number">
                 </div>
                 <div class="form-group">
                     <label for="driverNameOut"><span class="icon">👤</span>Name of Driver</label>
@@ -151,9 +151,9 @@
             </div>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="cardRegistrationIn"><span class="icon">💳</span>Card Registration Number</label>
+                    <label for="cardRegistrationIn"><span class="icon">💳</span>Vehicle Registration</label>
                     <select id="cardRegistrationIn" name="cardRegistrationIn" required>
-                        <option value="">Select card registration</option>
+                        <option value="">Select Vehicle Registration</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -184,7 +184,7 @@
             <table class="records-table" id="outRecordsTable">
                 <thead>
                     <tr>
-                        <th>Card Reg.</th>
+                        <th>Vehicle Reg.</th>
                         <th>Driver</th>
                         <th>Date/Time Out</th>
                         <th>Status</th>
@@ -198,7 +198,7 @@
             <table class="records-table" id="inRecordsTable">
                 <thead>
                     <tr>
-                        <th>Card Reg.</th>
+                        <th>Vehicle Reg.</th>
                         <th>Driver</th>
                         <th>Date Out</th>
                         <th>Date In</th>
@@ -243,7 +243,7 @@
     }
     function updateCardDropdown() {
         const dropdown = document.getElementById('cardRegistrationIn');
-        dropdown.innerHTML = '<option value="">Select card registration</option>';
+        dropdown.innerHTML = '<option value="">Select Vehicle registration</option>';
         outRecords.forEach(record => {
             const option = document.createElement('option');
             option.value = record.cardRegistration;
@@ -394,7 +394,7 @@
         await saveToBin();
     }
     function exportCSV() {
-        let csv = "Card Reg,Driver,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
+        let csv = "Vehicle Reg,Driver,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
         completedRecords.forEach(record => {
             csv += `"${record.cardRegistration}","${record.driverName}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
         });
