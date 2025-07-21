@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,14 +115,12 @@
         <p>Vehicle Usage & Fuel Tracking System</p>
     </div>
     <div class="form-container">
-        <!-- STATS PANEL, hidden by default -->
         <button class="show-stats-btn" id="showStatsBtn" type="button">Show Stats (Admin Only)</button>
         <div class="stats-panel" id="statsPanel" style="display:none"></div>
         <div class="data-tools">
             <button id="exportCsvBtn">Export CSV</button>
             <button id="clearAllBtn">Clear All Data</button>
         </div>
-        <!-- Vehicle Out Form -->
         <form id="vehicleOutForm">
             <div class="section-header">
                 <h2>🚗 Vehicle Check Out</h2>
@@ -146,7 +145,6 @@
                 <button type="submit" class="submit-btn">🚗 Check Out Vehicle</button>
             </div>
         </form>
-        <!-- Vehicle In Form -->
         <form id="vehicleInForm">
             <div class="section-header">
                 <h2>🏠 Vehicle Check In</h2>
@@ -204,7 +202,7 @@
                         <th>Driver</th>
                         <th>Date Out</th>
                         <th>Date In</th>
-                        <th>Mileage In</th>
+                        <th>Distance Traveled</th>
                         <th>Fuel Amount</th>
                     </tr>
                 </thead>
@@ -213,7 +211,6 @@
         </div>
     </div>
 </div>
-<!-- ADMIN PASSWORD MODAL -->
 <div class="modal" id="adminModal">
     <div class="modal-content">
         <h2>Admin Login Required</h2>
@@ -272,7 +269,7 @@
             <td>${record.driverName}</td>
             <td>${formatDateTime(record.dateTimeOut)}</td>
             <td>${formatDateTime(record.dateTimeIn)}</td>
-            <td>${parseFloat(record.mileageIn).toFixed(1)} km</td>
+            <td>${parseFloat(record.distanceTraveled).toFixed(1)} km</td>
             <td>R${parseFloat(record.fuelAmount).toFixed(2)}</td>
         `;
     }
@@ -292,13 +289,14 @@
             statsPanel.innerHTML = '';
             return;
         }
-        // --- same as before ---
+        
         const totalOut = outRecords.length;
         const totalTrips = completedRecords.length;
         const totalFuel = completedRecords.reduce((sum, r) => sum + parseFloat(r.fuelAmount || 0), 0);
-        const totalMileage = completedRecords.reduce((sum, r) => sum + parseFloat(r.mileageIn || 0), 0);
+        const totalDistanceTraveled = completedRecords.reduce((sum, r) => sum + parseFloat(r.distanceTraveled || 0), 0);
         const avgFuel = totalTrips ? (totalFuel / totalTrips) : 0;
-        const avgMileage = totalTrips ? (totalMileage / totalTrips) : 0;
+        const avgDistanceTraveled = totalTrips ? (totalDistanceTraveled / totalTrips) : 0;
+        
         let mostRecent = null;
         if (completedRecords.length) {
             mostRecent = completedRecords.reduce((a, b) => (a.dateTimeIn > b.dateTimeIn ? a : b));
@@ -328,16 +326,16 @@
             <div class="stat-label">Fuel Total</div>
           </div>
           <div class="stat-card"><div class="stat-icon">🛣️</div>
-            <div class="stat-value">${totalMileage.toFixed(1)} km</div>
-            <div class="stat-label">Mileage Total</div>
+            <div class="stat-value">${totalDistanceTraveled.toFixed(1)} km</div>
+            <div class="stat-label">Distance Total</div>
           </div>
           <div class="stat-card"><div class="stat-icon">💸</div>
             <div class="stat-value">R${avgFuel.toFixed(2)}</div>
             <div class="stat-label">Avg Fuel/Trip</div>
           </div>
           <div class="stat-card"><div class="stat-icon">📊</div>
-            <div class="stat-value">${avgMileage.toFixed(1)} km</div>
-            <div class="stat-label">Avg Mileage/Trip</div>
+            <div class="stat-value">${avgDistanceTraveled.toFixed(1)} km</div>
+            <div class="stat-label">Avg Distance/Trip</div>
           </div>
         `;
         if (mostRecent) {
@@ -396,9 +394,9 @@
         await saveToBin();
     }
     function exportCSV() {
-        let csv = "Card Reg,Driver,Date Out,Date In,Mileage In,Fuel Amount\n";
+        let csv = "Card Reg,Driver,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
         completedRecords.forEach(record => {
-            csv += `"${record.cardRegistration}","${record.driverName}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}"\n`;
+            csv += `"${record.cardRegistration}","${record.driverName}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
@@ -446,18 +444,40 @@
             alert('Date/Time In must be after Date/Time Out!');
             return;
         }
+
+        const currentMileageIn = parseFloat(formData.get('mileageIn'));
+        
+        const lastCompletedTrip = completedRecords
+            .filter(record => record.cardRegistration === cardRegistration)
+            .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
+            .at(0);
+
+        const lastMileageIn = lastCompletedTrip ? parseFloat(lastCompletedTrip.mileageIn) : 0;
+        
+        if (currentMileageIn < lastMileageIn) {
+            alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km) for this card.`);
+            return;
+        }
+
+        const distanceTraveled = currentMileageIn - lastMileageIn;
+
+
         const completedRecord = {
             ...outRecord,
-            mileageIn: formData.get('mileageIn'),
+            mileageIn: currentMileageIn,
+            lastMileageIn: lastMileageIn,
+            distanceTraveled: distanceTraveled,
             dateTimeIn: dateTimeIn,
             fuelAmount: formData.get('fuelAmount'),
             completedTimestamp: new Date().toISOString()
         };
+
         outRecords = outRecords.filter(record => record.cardRegistration !== cardRegistration);
         completedRecords.push(completedRecord);
         refreshTables();
         this.reset();
         document.getElementById('driverNameIn').value = '';
+        document.getElementById('mileageIn').value = '';
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('dateTimeIn').value = now.toISOString().slice(0, 16);
@@ -468,6 +488,13 @@
         const selectedCard = this.value;
         const outRecord = outRecords.find(record => record.cardRegistration === selectedCard);
         document.getElementById('driverNameIn').value = outRecord ? outRecord.driverName : '';
+
+        const lastCompletedTripForCard = completedRecords
+            .filter(record => record.cardRegistration === selectedCard)
+            .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
+            .at(0);
+        
+        document.getElementById('mileageIn').value = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn).toFixed(1) : '0';
     });
     document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
 
@@ -543,3 +570,4 @@
 </script>
 </body>
 </html>
+```
