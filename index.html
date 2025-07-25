@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,7 +163,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="mileageIn"><span class="icon">📊</span>Mileage In (km)</label>
-                    <input type="number" id="mileageIn" name="mileageIn" required placeholder="0" min="0" step="0.1">
+                    <input type="number" id="mileageIn" name="mileageIn" placeholder="0" min="0" step="0.1">
                 </div>
                 <div class="form-group">
                     <label for="dateTimeIn"><span class="icon">🕐</span>Date & Time In</label>
@@ -173,7 +172,7 @@
             </div>
             <div class="form-group fuel-amount">
                 <label for="fuelAmount"><span class="icon">⛽</span>Fuel Slip Amount</label>
-                <input type="number" id="fuelAmount" name="fuelAmount" required placeholder="0.00" min="0" step="0.01">
+                <input type="number" id="fuelAmount" name="fuelAmount" placeholder="0.00" min="0" step="0.01">
             </div>
             <div class="submit-section">
                 <button type="submit" class="submit-btn">🏠 Check In Vehicle</button>
@@ -445,7 +444,7 @@
             return;
         }
 
-        const currentMileageIn = parseFloat(formData.get('mileageIn'));
+        const mileageInInput = formData.get('mileageIn');
         
         const lastCompletedTrip = completedRecords
             .filter(record => record.cardRegistration === cardRegistration)
@@ -454,13 +453,20 @@
 
         const lastMileageIn = lastCompletedTrip ? parseFloat(lastCompletedTrip.mileageIn) : 0;
         
-        if (currentMileageIn < lastMileageIn) {
-            alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km) for this card.`);
-            return;
+        let currentMileageIn;
+        let distanceTraveled;
+
+        if (!mileageInInput || parseFloat(mileageInInput) === 0) {
+            currentMileageIn = lastMileageIn;
+            distanceTraveled = 0;
+        } else {
+            currentMileageIn = parseFloat(mileageInInput);
+            if (currentMileageIn < lastMileageIn) {
+                alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km) for this card.`);
+                return;
+            }
+            distanceTraveled = currentMileageIn - lastMileageIn;
         }
-
-        const distanceTraveled = currentMileageIn - lastMileageIn;
-
 
         const completedRecord = {
             ...outRecord,
@@ -468,7 +474,7 @@
             lastMileageIn: lastMileageIn,
             distanceTraveled: distanceTraveled,
             dateTimeIn: dateTimeIn,
-            fuelAmount: formData.get('fuelAmount'),
+            fuelAmount: formData.get('fuelAmount') || '0',
             completedTimestamp: new Date().toISOString()
         };
 
@@ -570,4 +576,3 @@
 </script>
 </body>
 </html>
-```
