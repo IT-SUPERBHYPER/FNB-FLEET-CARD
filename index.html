@@ -45,12 +45,12 @@
             transform: rotate(90deg);
         }
 
-        /* Collapsible content */
+        /* Collapsible content - No Transition for instant open/close */
         .collapsible-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-            padding: 0 20px; /* Initially no padding on collapsed state */
+            /* Removed transition for instant effect */
+            padding: 0 20px; /* Base padding */
             background: rgba(248,250,252,0.8);
             border-radius: 0 0 15px 15px;
             border: 2px solid #e2e8f0;
@@ -59,7 +59,7 @@
         }
         .collapsible-content.active {
             max-height: 1000px; /* Large enough value to show content */
-            padding: 20px 40px; /* Restore padding when active */
+            padding: 20px 40px; /* Apply padding instantly when active */
         }
         /* Override padding for forms within collapsible content */
         .collapsible-content form {
@@ -557,7 +557,7 @@
         }
         
         updateCardDropdown();
-        renderStats(); // This call is now safe as renderStats is defined above
+        renderStats(); 
     }
     async function loadFromBin() {
         try {
@@ -772,7 +772,7 @@
             this.classList.toggle('active');
             content.classList.toggle('active');
             if (content.classList.contains('active')) {
-                // Set max-height to scrollHeight for smooth animation when opening
+                // Set max-height to scrollHeight for instant opening
                 content.style.maxHeight = content.scrollHeight + "px";
             } else {
                 content.style.maxHeight = null;
