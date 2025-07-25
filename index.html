@@ -8,48 +8,109 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png" sizes="192x192">
     <style>
+        /* General styles */
         * {margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Arial',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;}
         .container{max-width:800px;margin:0 auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);overflow:hidden;}
+        
+        /* Header */
         .header{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;padding:30px;text-align:center;position:relative;}
         .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');pointer-events:none;}
         .header h1{font-size:2.5em;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
         .header p{font-size:1.1em;opacity:0.9;position:relative;z-index:1;}
+        
+        /* Form & Content Containers */
         .form-container{padding:40px;}
         .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-bottom:30px;}
         .form-group{position:relative;}
-        .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:0.95em;text-transform:uppercase;letter-spacing:0.5px;}
-        .form-group input,.form-group select,.form-group textarea{width:100%;padding:15px;border:2px solid #e1e8ed;border-radius:10px;font-size:1em;background:rgba(255,255,255,0.9);transition:all 0.3s ease;outline:none;}
+        .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:1em;text-transform:uppercase;letter-spacing:0.5px;} /* Adjusted font size */
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:18px;border:2px solid #e1e8ed;border-radius:10px;font-size:1em;background:rgba(255,255,255,0.9);transition:all 0.3s ease;outline:none;} /* Increased padding */
         .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1);transform:translateY(-2px);}
         .form-group input[type="datetime-local"]{font-family:inherit;}
         .fuel-amount{position:relative;}
         .fuel-amount::before{content:'R';position:absolute;left:15px;top:50%;transform:translateY(-50%);font-weight:bold;color:#667eea;z-index:1;}
         .fuel-amount input{padding-left:35px;}
-        .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3);}
+        
+        /* Section Headers */
+        .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3); cursor:pointer; display:flex; justify-content:space-between; align-items:center;} /* Added flex for caret */
         .section-header h2{font-size:1.5em;margin:0;font-weight:600;}
         .section-header:first-child{margin-top:0;}
+        
+        /* Accordion caret */
+        .section-header .caret {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+        .section-header.active .caret {
+            transform: rotate(90deg);
+        }
+
+        /* Collapsible content */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            padding: 0 20px; /* Initially no padding on collapsed state */
+            background: rgba(248,250,252,0.8);
+            border-radius: 0 0 15px 15px;
+            border: 2px solid #e2e8f0;
+            border-top: none;
+            margin: 0 -40px; /* Align with header */
+        }
+        .collapsible-content.active {
+            max-height: 1000px; /* Large enough value to show content */
+            padding: 20px 40px; /* Restore padding when active */
+        }
+        /* Override padding for forms within collapsible content */
+        .collapsible-content form {
+            padding: 0;
+            margin-bottom: 0;
+        }
+        .collapsible-content .submit-section {
+            margin-bottom: 0;
+        }
+
+        /* Specific section styles */
         .out-records,.in-records{margin-top:30px;padding:20px;background:rgba(248,250,252,0.8);border-radius:15px;border:2px solid #e2e8f0;}
         .out-records h3,.in-records h3{color:#2c5282;margin-bottom:15px;font-size:1.2em;}
+        
+        /* Status Badges */
         .status-badge{padding:5px 12px;border-radius:20px;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
         .status-out{background:#fed7d7;color:#c53030;}
         .status-complete{background:#c6f6d5;color:#2f855a;}
+        
+        /* Submit Button */
         .submit-section{text-align:center;margin-top:40px;}
-        .submit-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:18px 40px;border:none;border-radius:50px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:1px;box-shadow:0 10px 30px rgba(102,126,234,0.3);}
+        .submit-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px 45px;border:none;border-radius:50px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:1px;box-shadow:0 10px 30px rgba(102,126,234,0.3);} /* Increased padding */
         .submit-btn:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(102,126,234,0.4);}
         .submit-btn:active{transform:translateY(-1px);}
+        
+        /* Records Tables */
         .records-section{margin-top:50px;padding-top:30px;border-top:2px solid #e1e8ed;}
-        .table-responsive { /* Added for mobile responsiveness */
+        .table-responsive {
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            -webkit-overflow-scrolling: touch;
+            margin-top: 20px;
         }
-        .records-table{width:100%;border-collapse:collapse;margin-top:20px;background:white;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
-        .records-table th,.records-table td{padding:15px;text-align:left;border-bottom:1px solid #e1e8ed;}
+        .records-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+        .records-table th,.records-table td{padding:16px;text-align:left;border-bottom:1px solid #e1e8ed;font-size:0.95em;} /* Increased padding, adjusted font size */
         .records-table th{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
         .records-table tr:hover{background:rgba(102,126,234,0.05);}
+        .empty-table-message {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        
+        /* Icons & Data Tools */
         .icon{display:inline-block;margin-right:8px;opacity:0.7;}
         .data-tools{text-align:right;margin-top:10px;margin-bottom:-10px;}
-        .data-tools button{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:0.98em;font-weight:600;margin-left:8px;cursor:pointer;transition:background 0.3s;}
+        .data-tools button{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;margin-left:8px;cursor:pointer;transition:background 0.3s;} /* Increased padding */
         .data-tools button:hover{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
+        
+        /* Stats Panel */
         .stats-panel {
           display: flex; flex-wrap: wrap; gap: 18px; margin: 25px 0 32px 0; justify-content: center;
         }
@@ -79,13 +140,8 @@
           margin-top: 2px;
           text-align: center;
         }
-        @media (max-width: 650px) {
-          .stats-panel {gap: 11px;}
-          .stat-card {min-width:110px;padding:13px 9px;}
-          .stat-icon {font-size:1.45em;}
-          .stat-value {font-size:1em;}
-        }
-        /* Modal styles */
+        
+        /* Modal Styles */
         .modal {
             display:none;position:fixed;z-index:999;left:0;top:0;width:100vw;height:100vh;
             background:rgba(30,44,74,0.45);justify-content:center;align-items:center;
@@ -105,10 +161,101 @@
         .modal-content .error {color:#c53030;font-size:0.96em;margin-bottom:8px;}
         .show-stats-btn {
             background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);
-            color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:0.98em;font-weight:600;cursor:pointer;transition:background 0.3s; margin-bottom:16px;
-        }
+            color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;cursor:pointer;transition:background 0.3s; margin-bottom:16px;
+        } /* Increased padding */
         .show-stats-btn:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
-        @media (max-width:768px){.form-grid{grid-template-columns:1fr;}.header h1{font-size:2em;}.form-container{padding:20px;}}
+        
+        /* Mobile Specific Optimizations */
+        @media (max-width: 768px) {
+            body {padding: 10px;}
+            .container {border-radius: 10px;}
+            .form-container {padding: 15px;}
+            .header {padding: 20px;}
+            .header h1 {font-size: 1.8em;}
+            .header p {font-size: 1em;}
+            .form-grid {grid-template-columns: 1fr; gap: 20px;}
+            .section-header {margin: 20px -15px; padding: 15px;}
+            .section-header h2 {font-size: 1.3em;}
+
+            /* Table to Card Transformation */
+            .records-table, .records-table thead, .records-table tbody, .records-table th, .records-table td, .records-table tr {
+                display: block;
+                width: 100%;
+            }
+            .records-table thead {
+                display: none; /* Hide original headers */
+            }
+            .records-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #e1e8ed;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                overflow: hidden; /* Ensure border-radius applies */
+            }
+            .records-table td {
+                text-align: right;
+                padding-left: 50%; /* Make space for the label */
+                position: relative;
+                border-bottom: 1px dashed #e1e8ed; /* Visually separate rows within card */
+                font-size: 0.9em; /* Slightly smaller font for table cells on mobile */
+            }
+            .records-table td::before {
+                content: attr(data-label); /* Use data-label for content */
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+            /* Specific labels for outRecordsTable */
+            #outRecordsTable td:nth-of-type(1)::before { content: "Vehicle Reg.:"; }
+            #outRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
+            #outRecordsTable td:nth-of-type(3)::before { content: "Date/Time Out:"; }
+            #outRecordsTable td:nth-of-type(4)::before { content: "Status:"; }
+
+            /* Specific labels for inRecordsTable */
+            #inRecordsTable td:nth-of-type(1)::before { content: "Vehicle Reg.:"; }
+            #inRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
+            #inRecordsTable td:nth-of-type(3)::before { content: "Date Out:"; }
+            #inRecordsTable td:nth-of-type(4)::before { content: "Date In:"; }
+            #inRecordsTable td:nth-of-type(5)::before { content: "Distance Traveled:"; }
+            #inRecordsTable td:nth-of-type(6)::before { content: "Fuel Amount:"; }
+
+            .records-table td:last-child {
+                border-bottom: 0; /* No border for the last cell in a card */
+            }
+            .data-tools button, .show-stats-btn {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+            .data-tools {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+            }
+            .stats-panel {
+                gap: 10px;
+                margin: 15px 0 20px 0;
+            }
+            .stat-card {
+                min-width: 100px;
+                padding: 10px 5px;
+            }
+            .stat-icon {
+                font-size: 1.5em;
+            }
+            .stat-value {
+                font-size: 1.1em;
+            }
+            .stat-label {
+                font-size: 0.85em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -118,100 +265,134 @@
         <p>Vehicle Usage & Fuel Tracking System</p>
     </div>
     <div class="form-container">
-        <button class="show-stats-btn" id="showStatsBtn" type="button">Show Stats (Admin Only)</button>
-        <div class="stats-panel" id="statsPanel" style="display:none"></div>
-        <div class="data-tools">
-            <button id="exportCsvBtn">Export CSV</button>
-            <button id="clearAllBtn">Clear All Data</button>
+        <div class="collapsible-section">
+            <div class="section-header" id="statsHeader">
+                <h2>📊 Stats & Admin Tools</h2>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <button class="show-stats-btn" id="showStatsBtn" type="button">Show Stats (Admin Only)</button>
+                <div class="stats-panel" id="statsPanel" style="display:none"></div>
+                <div class="data-tools">
+                    <button id="exportCsvBtn">Export CSV</button>
+                    <button id="clearAllBtn">Clear All Data</button>
+                </div>
+            </div>
         </div>
-        <form id="vehicleOutForm">
-            <div class="section-header">
+
+        <div class="collapsible-section">
+            <div class="section-header" id="checkoutHeader">
                 <h2>🚗 Vehicle Check Out</h2>
+                <span class="caret">▶</span>
             </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="cardRegistrationOut"><span class="icon">💳</span>Vehicle Registration</label>
-                    <input type="text" id="cardRegistrationOut" name="cardRegistrationOut" required placeholder="Enter Vehicle registration number">
-                </div>
-                <div class="form-group">
-                    <label for="driverNameOut"><span class="icon">👤</span>Name of Driver</label>
-                    <input type="text" id="driverNameOut" name="driverNameOut" required placeholder="Enter driver's full name">
-                </div>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="dateTimeOut"><span class="icon">🕐</span>Date & Time Out</label>
-                    <input type="datetime-local" id="dateTimeOut" name="dateTimeOut" required>
-                </div>
-            </div>
-            <div class="submit-section">
-                <button type="submit" class="submit-btn">🚗 Check Out Vehicle</button>
-            </div>
-        </form>
-        <form id="vehicleInForm">
-            <div class="section-header">
-                <h2>🏠 Vehicle Check In</h2>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="cardRegistrationIn"><span class="icon">💳</span>Vehicle Registration</label>
-                    <select id="cardRegistrationIn" name="cardRegistrationIn" required>
-                        <option value="">Select Vehicle Registration</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="driverNameIn"><span class="icon">👤</span>Driver Name</label>
-                    <input type="text" id="driverNameIn" name="driverNameIn" readonly placeholder="Auto-filled from checkout">
-                </div>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="mileageIn"><span class="icon">📊</span>Mileage In (km)</label>
-                    <input type="number" id="mileageIn" name="mileageIn" placeholder="0" min="0" step="0.1">
-                </div>
-                <div class="form-group">
-                    <label for="dateTimeIn"><span class="icon">🕐</span>Date & Time In</label>
-                    <input type="datetime-local" id="dateTimeIn" name="dateTimeIn" required>
-                </div>
-            </div>
-            <div class="form-group fuel-amount">
-                <label for="fuelAmount"><span class="icon">⛽</span>Fuel Slip Amount</label>
-                <input type="number" id="fuelAmount" name="fuelAmount" placeholder="0.00" min="0" step="0.01">
-            </div>
-            <div class="submit-section">
-                <button type="submit" class="submit-btn">🏠 Check In Vehicle</button>
-            </div>
-        </form>
-        <div class="out-records">
-            <h3>🚗 Vehicles Currently Out</h3>
-            <div class="table-responsive"> <table class="records-table" id="outRecordsTable">
-                    <thead>
-                        <tr>
-                            <th>Vehicle Reg.</th>
-                            <th>Driver</th>
-                            <th>Date/Time Out</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="outRecordsBody"></tbody>
-                </table>
+            <div class="collapsible-content">
+                <form id="vehicleOutForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cardRegistrationOut"><span class="icon">💳</span>Vehicle Registration</label>
+                            <input type="text" id="cardRegistrationOut" name="cardRegistrationOut" required placeholder="Enter Vehicle registration number">
+                        </div>
+                        <div class="form-group">
+                            <label for="driverNameOut"><span class="icon">👤</span>Name of Driver</label>
+                            <input type="text" id="driverNameOut" name="driverNameOut" required placeholder="Enter driver's full name">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="dateTimeOut"><span class="icon">🕐</span>Date & Time Out</label>
+                            <input type="datetime-local" id="dateTimeOut" name="dateTimeOut" required>
+                        </div>
+                    </div>
+                    <div class="submit-section">
+                        <button type="submit" class="submit-btn">🚗 Check Out Vehicle</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="in-records">
-            <h3>🏠 Completed Trips</h3>
-            <div class="table-responsive"> <table class="records-table" id="inRecordsTable">
-                    <thead>
-                        <tr>
-                            <th>Vehicle Reg.</th>
-                            <th>Driver</th>
-                            <th>Date Out</th>
-                            <th>Date In</th>
-                            <th>Distance Traveled</th>
-                            <th>Fuel Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inRecordsBody"></tbody>
-                </table>
+
+        <div class="collapsible-section">
+            <div class="section-header" id="checkinHeader">
+                <h2>🏠 Vehicle Check In</h2>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <form id="vehicleInForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cardRegistrationIn"><span class="icon">💳</span>Vehicle Registration</label>
+                            <select id="cardRegistrationIn" name="cardRegistrationIn" required>
+                                <option value="">Select Vehicle Registration</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverNameIn"><span class="icon">👤</span>Driver Name</label>
+                            <input type="text" id="driverNameIn" name="driverNameIn" readonly placeholder="Auto-filled from checkout">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="mileageIn"><span class="icon">📊</span>Mileage In (km)</label>
+                            <input type="number" id="mileageIn" name="mileageIn" placeholder="0" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="dateTimeIn"><span class="icon">🕐</span>Date & Time In</label>
+                            <input type="datetime-local" id="dateTimeIn" name="dateTimeIn" required>
+                        </div>
+                    </div>
+                    <div class="form-group fuel-amount">
+                        <label for="fuelAmount"><span class="icon">⛽</span>Fuel Slip Amount</label>
+                        <input type="number" id="fuelAmount" name="fuelAmount" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                    <div class="submit-section">
+                        <button type="submit" class="submit-btn">🏠 Check In Vehicle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <div class="section-header" id="outRecordsHeader">
+                <h3>🚗 Vehicles Currently Out</h3>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="table-responsive">
+                    <table class="records-table" id="outRecordsTable">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Reg.</th>
+                                <th>Driver</th>
+                                <th>Date/Time Out</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="outRecordsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <div class="section-header" id="inRecordsHeader">
+                <h3>🏠 Completed Trips</h3>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="table-responsive">
+                    <table class="records-table" id="inRecordsTable">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Reg.</th>
+                                <th>Driver</th>
+                                <th>Date Out</th>
+                                <th>Date In</th>
+                                <th>Distance Traveled</th>
+                                <th>Fuel Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inRecordsBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -246,46 +427,8 @@
             minute: '2-digit'
         });
     }
-    function updateCardDropdown() {
-        const dropdown = document.getElementById('cardRegistrationIn');
-        dropdown.innerHTML = '<option value="">Select Vehicle registration</option>';
-        outRecords.forEach(record => {
-            const option = document.createElement('option');
-            option.value = record.cardRegistration;
-            option.textContent = `${record.cardRegistration} - ${record.driverName}`;
-            dropdown.appendChild(option);
-        });
-    }
-    function addOutRecordToTable(record) {
-        const tbody = document.getElementById('outRecordsBody');
-        const row = tbody.insertRow(0);
-        row.innerHTML = `
-            <td>${record.cardRegistration}</td>
-            <td>${record.driverName}</td>
-            <td>${formatDateTime(record.dateTimeOut)}</td>
-            <td><span class="status-badge status-out">Out</span></td>
-        `;
-    }
-    function addCompletedRecordToTable(record) {
-        const tbody = document.getElementById('inRecordsBody');
-        const row = tbody.insertRow(0);
-        row.innerHTML = `
-            <td>${record.cardRegistration}</td>
-            <td>${record.driverName}</td>
-            <td>${formatDateTime(record.dateTimeOut)}</td>
-            <td>${formatDateTime(record.dateTimeIn)}</td>
-            <td>${parseFloat(record.distanceTraveled).toFixed(1)} km</td>
-            <td>R${parseFloat(record.fuelAmount).toFixed(2)}</td>
-        `;
-    }
-    function refreshTables() {
-        document.getElementById('outRecordsBody').innerHTML = '';
-        document.getElementById('inRecordsBody').innerHTML = '';
-        outRecords.forEach(addOutRecordToTable);
-        completedRecords.forEach(addCompletedRecordToTable);
-        updateCardDropdown();
-        renderStats();
-    }
+
+    // Moved renderStats definition before its call in refreshTables
     function renderStats() {
         const statsPanel = document.getElementById('statsPanel');
         statsPanel.style.display = isAdmin ? '' : 'none';
@@ -361,6 +504,61 @@
         }
         statsPanel.innerHTML = html;
     }
+
+    function updateCardDropdown() {
+        const dropdown = document.getElementById('cardRegistrationIn');
+        dropdown.innerHTML = '<option value="">Select Vehicle registration</option>';
+        outRecords.forEach(record => {
+            const option = document.createElement('option');
+            option.value = record.cardRegistration;
+            option.textContent = `${record.cardRegistration} - ${record.driverName}`;
+            dropdown.appendChild(option);
+        });
+    }
+    function addOutRecordToTable(record) {
+        const tbody = document.getElementById('outRecordsBody');
+        const row = tbody.insertRow(0);
+        row.innerHTML = `
+            <td>${record.cardRegistration}</td>
+            <td>${record.driverName}</td>
+            <td>${formatDateTime(record.dateTimeOut)}</td>
+            <td><span class="status-badge status-out">Out</span></td>
+        `;
+    }
+    function addCompletedRecordToTable(record) {
+        const tbody = document.getElementById('inRecordsBody');
+        const row = tbody.insertRow(0);
+        row.innerHTML = `
+            <td>${record.cardRegistration}</td>
+            <td>${record.driverName}</td>
+            <td>${formatDateTime(record.dateTimeOut)}</td>
+            <td>${formatDateTime(record.dateTimeIn)}</td>
+            <td>${parseFloat(record.distanceTraveled).toFixed(1)} km</td>
+            <td>R${parseFloat(record.fuelAmount).toFixed(2)}</td>
+        `;
+    }
+    function refreshTables() {
+        const outRecordsBody = document.getElementById('outRecordsBody');
+        const inRecordsBody = document.getElementById('inRecordsBody');
+
+        outRecordsBody.innerHTML = '';
+        inRecordsBody.innerHTML = '';
+
+        if (outRecords.length === 0) {
+            outRecordsBody.innerHTML = '<tr><td colspan="4" class="empty-table-message">No vehicles currently checked out.</td></tr>';
+        } else {
+            outRecords.forEach(addOutRecordToTable);
+        }
+
+        if (completedRecords.length === 0) {
+            inRecordsBody.innerHTML = '<tr><td colspan="6" class="empty-table-message">No completed trips yet.</td></tr>';
+        } else {
+            completedRecords.forEach(addCompletedRecordToTable);
+        }
+        
+        updateCardDropdown();
+        renderStats(); // This call is now safe as renderStats is defined above
+    }
     async function loadFromBin() {
         try {
             const res = await fetch(JSONBIN_URL + '/latest', {
@@ -426,8 +624,7 @@
             timestamp: new Date().toISOString()
         };
         outRecords.push(record);
-        addOutRecordToTable(record);
-        updateCardDropdown();
+        refreshTables(); // Call refreshTables to update both tables and dropdown, and empty states
         this.reset();
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -568,6 +765,21 @@
         });
     });
 
+    // --- Accordion Logic ---
+    document.querySelectorAll('.collapsible-section .section-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            this.classList.toggle('active');
+            content.classList.toggle('active');
+            if (content.classList.contains('active')) {
+                // Set max-height to scrollHeight for smooth animation when opening
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = null;
+            }
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', async function() {
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -577,6 +789,15 @@
         await loadFromBin();
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');
+        }
+
+        // Collapse all sections by default on mobile load
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.collapsible-section .collapsible-content').forEach(content => {
+                content.style.maxHeight = null; // Ensure they are closed
+                content.previousElementSibling.classList.remove('active');
+                content.classList.remove('active');
+            });
         }
     });
 </script>
