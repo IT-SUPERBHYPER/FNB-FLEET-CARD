@@ -38,6 +38,10 @@
         .submit-btn:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(102,126,234,0.4);}
         .submit-btn:active{transform:translateY(-1px);}
         .records-section{margin-top:50px;padding-top:30px;border-top:2px solid #e1e8ed;}
+        .table-responsive { /* Added for mobile responsiveness */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
         .records-table{width:100%;border-collapse:collapse;margin-top:20px;background:white;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
         .records-table th,.records-table td{padding:15px;text-align:left;border-bottom:1px solid #e1e8ed;}
         .records-table th{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
@@ -180,33 +184,35 @@
         </form>
         <div class="out-records">
             <h3>🚗 Vehicles Currently Out</h3>
-            <table class="records-table" id="outRecordsTable">
-                <thead>
-                    <tr>
-                        <th>Vehicle Reg.</th>
-                        <th>Driver</th>
-                        <th>Date/Time Out</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="outRecordsBody"></tbody>
-            </table>
+            <div class="table-responsive"> <table class="records-table" id="outRecordsTable">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Reg.</th>
+                            <th>Driver</th>
+                            <th>Date/Time Out</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="outRecordsBody"></tbody>
+                </table>
+            </div>
         </div>
         <div class="in-records">
             <h3>🏠 Completed Trips</h3>
-            <table class="records-table" id="inRecordsTable">
-                <thead>
-                    <tr>
-                        <th>Vehicle Reg.</th>
-                        <th>Driver</th>
-                        <th>Date Out</th>
-                        <th>Date In</th>
-                        <th>Distance Traveled</th>
-                        <th>Fuel Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="inRecordsBody"></tbody>
-            </table>
+            <div class="table-responsive"> <table class="records-table" id="inRecordsTable">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Reg.</th>
+                            <th>Driver</th>
+                            <th>Date Out</th>
+                            <th>Date In</th>
+                            <th>Distance Traveled</th>
+                            <th>Fuel Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inRecordsBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
