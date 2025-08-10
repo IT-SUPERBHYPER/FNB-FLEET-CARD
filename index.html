@@ -23,8 +23,8 @@
         .form-container{padding:40px;}
         .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-bottom:30px;}
         .form-group{position:relative;}
-        .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:1em;text-transform:uppercase;letter-spacing:0.5px;} /* Adjusted font size */
-        .form-group input,.form-group select,.form-group textarea{width:100%;padding:18px;border:2px solid #e1e8ed;border-radius:10px;font-size:1em;background:rgba(255,255,255,0.9);transition:all 0.3s ease;outline:none;} /* Increased padding */
+        .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:1em;text-transform:uppercase;letter-spacing:0.5px;}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:18px;border:2px solid #e1e8ed;border-radius:10px;font-size:1em;background:rgba(255,255,255,0.9);transition:all 0.3s ease;outline:none;}
         .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1);transform:translateY(-2px);}
         .form-group input[type="datetime-local"]{font-family:inherit;}
         .fuel-amount{position:relative;}
@@ -32,7 +32,7 @@
         .fuel-amount input{padding-left:35px;}
         
         /* Section Headers */
-        .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3); cursor:pointer; display:flex; justify-content:space-between; align-items:center;} /* Added flex for caret */
+        .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3); cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
         .section-header h2{font-size:1.5em;margin:0;font-weight:600;}
         .section-header:first-child{margin-top:0;}
         
@@ -45,23 +45,21 @@
             transform: rotate(90deg);
         }
 
-        /* Collapsible content - No Transition for instant open/close */
+        /* Collapsible content */
         .collapsible-content {
             max-height: 0;
             overflow: hidden;
-            /* Removed transition for instant effect */
-            padding: 0 20px; /* Base padding */
+            padding: 0 20px;
             background: rgba(248,250,252,0.8);
             border-radius: 0 0 15px 15px;
             border: 2px solid #e2e8f0;
             border-top: none;
-            margin: 0 -40px; /* Align with header */
+            margin: 0 -40px;
         }
         .collapsible-content.active {
-            max-height: 1000px; /* Large enough value to show content */
-            padding: 20px 40px; /* Apply padding instantly when active */
+            max-height: 1000px;
+            padding: 20px 40px;
         }
-        /* Override padding for forms within collapsible content */
         .collapsible-content form {
             padding: 0;
             margin-bottom: 0;
@@ -81,7 +79,7 @@
         
         /* Submit Button */
         .submit-section{text-align:center;margin-top:40px;}
-        .submit-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px 45px;border:none;border-radius:50px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:1px;box-shadow:0 10px 30px rgba(102,126,234,0.3);} /* Increased padding */
+        .submit-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px 45px;border:none;border-radius:50px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:1px;box-shadow:0 10px 30px rgba(102,126,234,0.3);}
         .submit-btn:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(102,126,234,0.4);}
         .submit-btn:active{transform:translateY(-1px);}
         
@@ -93,7 +91,7 @@
             margin-top: 20px;
         }
         .records-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
-        .records-table th,.records-table td{padding:16px;text-align:left;border-bottom:1px solid #e1e8ed;font-size:0.95em;} /* Increased padding, adjusted font size */
+        .records-table th,.records-table td{padding:16px;text-align:left;border-bottom:1px solid #e1e8ed;font-size:0.95em;}
         .records-table th{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
         .records-table tr:hover{background:rgba(102,126,234,0.05);}
         .empty-table-message {
@@ -107,7 +105,7 @@
         /* Icons & Data Tools */
         .icon{display:inline-block;margin-right:8px;opacity:0.7;}
         .data-tools{text-align:right;margin-top:10px;margin-bottom:-10px;}
-        .data-tools button{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;margin-left:8px;cursor:pointer;transition:background 0.3s;} /* Increased padding */
+        .data-tools button{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;margin-left:8px;cursor:pointer;transition:background 0.3s;}
         .data-tools button:hover{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
         
         /* Stats Panel */
@@ -156,13 +154,15 @@
         .modal-content button {
             background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:18px;
             padding:9px 22px;font-size:1em;font-weight:600;margin:0 8px;cursor:pointer;
+            margin-bottom: 10px;
+            width: 100%;
         }
         .modal-content button:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
         .modal-content .error {color:#c53030;font-size:0.96em;margin-bottom:8px;}
         .show-stats-btn {
             background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);
             color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;cursor:pointer;transition:background 0.3s; margin-bottom:16px;
-        } /* Increased padding */
+        }
         .show-stats-btn:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
         
         /* Mobile Specific Optimizations */
@@ -183,24 +183,24 @@
                 width: 100%;
             }
             .records-table thead {
-                display: none; /* Hide original headers */
+                display: none;
             }
             .records-table tr {
                 margin-bottom: 15px;
                 border: 1px solid #e1e8ed;
                 border-radius: 8px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                overflow: hidden; /* Ensure border-radius applies */
+                overflow: hidden;
             }
             .records-table td {
                 text-align: right;
-                padding-left: 50%; /* Make space for the label */
+                padding-left: 50%;
                 position: relative;
-                border-bottom: 1px dashed #e1e8ed; /* Visually separate rows within card */
-                font-size: 0.9em; /* Slightly smaller font for table cells on mobile */
+                border-bottom: 1px dashed #e1e8ed;
+                font-size: 0.9em;
             }
             .records-table td::before {
-                content: attr(data-label); /* Use data-label for content */
+                content: attr(data-label);
                 position: absolute;
                 left: 10px;
                 width: 45%;
@@ -225,7 +225,7 @@
             #inRecordsTable td:nth-of-type(6)::before { content: "Fuel Amount:"; }
 
             .records-table td:last-child {
-                border-bottom: 0; /* No border for the last cell in a card */
+                border-bottom: 0;
             }
             .data-tools button, .show-stats-btn {
                 width: 100%;
@@ -397,6 +397,8 @@
         </div>
     </div>
 </div>
+
+<!-- Admin Modal -->
 <div class="modal" id="adminModal">
     <div class="modal-content">
         <h2>Admin Login Required</h2>
@@ -406,6 +408,18 @@
         <button id="adminCancelBtn">Cancel</button>
     </div>
 </div>
+
+<!-- Export Options Modal -->
+<div class="modal" id="exportModal">
+    <div class="modal-content">
+        <h2>Export Options</h2>
+        <p>Select export type:</p>
+        <button id="exportLifeToDateBtn">Life to Date</button>
+        <button id="exportMonthToDateBtn">Month to Date</button>
+        <button id="exportCancelBtn">Cancel</button>
+    </div>
+</div>
+
 <script>
     // === JSONBin Config ===
     const JSONBIN_ID = '686cdbfa8a456b7966bd5883';
@@ -596,19 +610,91 @@
         refreshTables();
         await saveToBin();
     }
-    function exportCSV() {
-        let csv = "Vehicle Reg,Driver,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
-        completedRecords.forEach(record => {
-            csv += `"${record.cardRegistration}","${record.driverName}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
+
+    // Function to calculate totals for export
+    function calculateExportTotals(records) {
+        let totalMileage = 0;
+        let totalFuel = 0;
+        let totalDistance = 0;
+
+        records.forEach(record => {
+            totalMileage += parseFloat(record.mileageIn || 0);
+            totalFuel += parseFloat(record.fuelAmount || 0);
+            totalDistance += parseFloat(record.distanceTraveled || 0);
         });
-        const blob = new Blob([csv], { type: 'text/csv' });
+
+        return {
+            totalMileage: totalMileage.toFixed(1),
+            totalFuel: totalFuel.toFixed(2),
+            totalDistance: totalDistance.toFixed(1)
+        };
+    }
+
+    // Export Life to Date
+    function exportLifeToDateCSV() {
+        let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
+        completedRecords.forEach(record => {
+            const dateOut = new Date(record.dateTimeOut);
+            const monthOut = dateOut.toLocaleString('default', { month: 'long' });
+            
+            csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
+        });
+
+        // Add totals row
+        const totals = calculateExportTotals(completedRecords);
+        csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
+
+        downloadCSV(csv, "fleet_life_to_date.csv");
+    }
+
+    // Export Month to Date
+    function exportMonthToDateCSV() {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+        
+        const monthRecords = completedRecords.filter(record => {
+            const recordDate = new Date(record.dateTimeIn);
+            return recordDate.getMonth() === currentMonth && 
+                   recordDate.getFullYear() === currentYear;
+        });
+        
+        let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
+        monthRecords.forEach(record => {
+            const dateOut = new Date(record.dateTimeOut);
+            const monthOut = dateOut.toLocaleString('default', { month: 'long' });
+            
+            csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
+        });
+
+        // Add totals row
+        const totals = calculateExportTotals(monthRecords);
+        csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
+
+        downloadCSV(csv, `fleet_${currentDate.toLocaleString('default', { month: 'long' })}_${currentYear}.csv`);
+    }
+
+    // Download CSV helper
+    function downloadCSV(csvContent, filename) {
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = "fleet_completed_trips.csv";
+        a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
     }
+
+    // Show export options modal
+    function showExportModal() {
+        exportModal.style.display = 'flex';
+    }
+
+    // Hide export options modal
+    function hideExportModal() {
+        exportModal.style.display = 'none';
+    }
+
     document.getElementById('vehicleOutForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -705,7 +791,6 @@
         
         document.getElementById('mileageIn').value = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn).toFixed(1) : '0';
     });
-    document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
 
     // --- Modal logic ---
     const adminModal = document.getElementById('adminModal');
@@ -765,6 +850,32 @@
         });
     });
 
+    // --- Export Options Modal ---
+    const exportModal = document.getElementById('exportModal');
+    const exportLifeToDateBtn = document.getElementById('exportLifeToDateBtn');
+    const exportMonthToDateBtn = document.getElementById('exportMonthToDateBtn');
+    const exportCancelBtn = document.getElementById('exportCancelBtn');
+
+    document.getElementById('exportCsvBtn').addEventListener('click', showExportModal);
+    
+    exportLifeToDateBtn.addEventListener('click', function() {
+        hideExportModal();
+        exportLifeToDateCSV();
+    });
+    
+    exportMonthToDateBtn.addEventListener('click', function() {
+        hideExportModal();
+        exportMonthToDateCSV();
+    });
+    
+    exportCancelBtn.addEventListener('click', hideExportModal);
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === adminModal) hideAdminModal();
+        if (event.target === exportModal) hideExportModal();
+    });
+
     // --- Accordion Logic ---
     document.querySelectorAll('.collapsible-section .section-header').forEach(header => {
         header.addEventListener('click', function() {
@@ -772,7 +883,6 @@
             this.classList.toggle('active');
             content.classList.toggle('active');
             if (content.classList.contains('active')) {
-                // Set max-height to scrollHeight for instant opening
                 content.style.maxHeight = content.scrollHeight + "px";
             } else {
                 content.style.maxHeight = null;
@@ -794,7 +904,7 @@
         // Collapse all sections by default on mobile load
         if (window.innerWidth <= 768) {
             document.querySelectorAll('.collapsible-section .collapsible-content').forEach(content => {
-                content.style.maxHeight = null; // Ensure they are closed
+                content.style.maxHeight = null;
                 content.previousElementSibling.classList.remove('active');
                 content.classList.remove('active');
             });
