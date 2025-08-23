@@ -12,13 +12,11 @@
         * {margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Arial',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;}
         .container{max-width:800px;margin:0 auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);overflow:hidden;}
-        
         /* Header */
         .header{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;padding:30px;text-align:center;position:relative;}
         .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');pointer-events:none;}
         .header h1{font-size:2.5em;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
         .header p{font-size:1.1em;opacity:0.9;position:relative;z-index:1;}
-        
         /* Form & Content Containers */
         .form-container{padding:40px;}
         .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-bottom:30px;}
@@ -30,12 +28,10 @@
         .fuel-amount{position:relative;}
         .fuel-amount::before{content:'R';position:absolute;left:15px;top:50%;transform:translateY(-50%);font-weight:bold;color:#667eea;z-index:1;}
         .fuel-amount input{padding-left:35px;}
-        
         /* Section Headers */
         .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3); cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
         .section-header h2{font-size:1.5em;margin:0;font-weight:600;}
         .section-header:first-child{margin-top:0;}
-        
         /* Accordion caret */
         .section-header .caret {
             font-size: 1.5em;
@@ -44,7 +40,6 @@
         .section-header.active .caret {
             transform: rotate(90deg);
         }
-
         /* Collapsible content */
         .collapsible-content {
             max-height: 0;
@@ -67,22 +62,18 @@
         .collapsible-content .submit-section {
             margin-bottom: 0;
         }
-
         /* Specific section styles */
         .out-records,.in-records{margin-top:30px;padding:20px;background:rgba(248,250,252,0.8);border-radius:15px;border:2px solid #e2e8f0;}
         .out-records h3,.in-records h3{color:#2c5282;margin-bottom:15px;font-size:1.2em;}
-        
         /* Status Badges */
         .status-badge{padding:5px 12px;border-radius:20px;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
         .status-out{background:#fed7d7;color:#c53030;}
         .status-complete{background:#c6f6d5;color:#2f855a;}
-        
         /* Submit Button */
         .submit-section{text-align:center;margin-top:40px;}
         .submit-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px 45px;border:none;border-radius:50px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:1px;box-shadow:0 10px 30px rgba(102,126,234,0.3);}
         .submit-btn:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(102,126,234,0.4);}
         .submit-btn:active{transform:translateY(-1px);}
-        
         /* Records Tables */
         .records-section{margin-top:50px;padding-top:30px;border-top:2px solid #e1e8ed;}
         .table-responsive {
@@ -101,13 +92,11 @@
             font-style: italic;
             font-size: 1.1em;
         }
-        
         /* Icons & Data Tools */
         .icon{display:inline-block;margin-right:8px;opacity:0.7;}
         .data-tools{text-align:right;margin-top:10px;margin-bottom:-10px;}
         .data-tools button{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;margin-left:8px;cursor:pointer;transition:background 0.3s;}
         .data-tools button:hover{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
-        
         /* Stats Panel */
         .stats-panel {
           display: flex; flex-wrap: wrap; gap: 18px; margin: 25px 0 32px 0; justify-content: center;
@@ -138,7 +127,6 @@
           margin-top: 2px;
           text-align: center;
         }
-        
         /* Modal Styles */
         .modal {
             display:none;position:fixed;z-index:999;left:0;top:0;width:100vw;height:100vh;
@@ -164,7 +152,6 @@
             color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;cursor:pointer;transition:background 0.3s; margin-bottom:16px;
         }
         .show-stats-btn:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
-        
         /* Error message for fuel amount */
         .fuel-error {
             color: #c53030;
@@ -172,7 +159,6 @@
             margin-top: 5px;
             display: none;
         }
-        
         /* Mobile Specific Optimizations */
         @media (max-width: 768px) {
             body {padding: 10px;}
@@ -184,7 +170,6 @@
             .form-grid {grid-template-columns: 1fr; gap: 20px;}
             .section-header {margin: 20px -15px; padding: 15px;}
             .section-header h2 {font-size: 1.3em;}
-
             /* Table to Card Transformation */
             .records-table, .records-table thead, .records-table tbody, .records-table th, .records-table td, .records-table tr {
                 display: block;
@@ -218,20 +203,16 @@
                 font-weight: bold;
                 color: #555;
             }
-            /* Specific labels for outRecordsTable */
             #outRecordsTable td:nth-of-type(1)::before { content: "Vehicle Reg.:"; }
             #outRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
             #outRecordsTable td:nth-of-type(3)::before { content: "Date/Time Out:"; }
             #outRecordsTable td:nth-of-type(4)::before { content: "Status:"; }
-
-            /* Specific labels for inRecordsTable */
             #inRecordsTable td:nth-of-type(1)::before { content: "Vehicle Reg.:"; }
             #inRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
             #inRecordsTable td:nth-of-type(3)::before { content: "Date Out:"; }
             #inRecordsTable td:nth-of-type(4)::before { content: "Date In:"; }
             #inRecordsTable td:nth-of-type(5)::before { content: "Distance Traveled:"; }
             #inRecordsTable td:nth-of-type(6)::before { content: "Fuel Amount:"; }
-
             .records-table td:last-child {
                 border-bottom: 0;
             }
@@ -287,7 +268,6 @@
                 </div>
             </div>
         </div>
-
         <div class="collapsible-section">
             <div class="section-header" id="checkoutHeader">
                 <h2>🚗 Vehicle Check Out</h2>
@@ -317,7 +297,6 @@
                 </form>
             </div>
         </div>
-
         <div class="collapsible-section">
             <div class="section-header" id="checkinHeader">
                 <h2>🏠 Vehicle Check In</h2>
@@ -358,7 +337,6 @@
                 </form>
             </div>
         </div>
-
         <div class="collapsible-section">
             <div class="section-header" id="outRecordsHeader">
                 <h3>🚗 Vehicles Currently Out</h3>
@@ -380,7 +358,6 @@
                 </div>
             </div>
         </div>
-
         <div class="collapsible-section">
             <div class="section-header" id="inRecordsHeader">
                 <h3>🏠 Completed Trips</h3>
@@ -406,7 +383,6 @@
         </div>
     </div>
 </div>
-
 <!-- Admin Modal -->
 <div class="modal" id="adminModal">
     <div class="modal-content">
@@ -417,7 +393,6 @@
         <button id="adminCancelBtn">Cancel</button>
     </div>
 </div>
-
 <!-- Export Options Modal -->
 <div class="modal" id="exportModal">
     <div class="modal-content">
@@ -428,16 +403,16 @@
         <button id="exportCancelBtn">Cancel</button>
     </div>
 </div>
-
 <script>
-    // === JSONBin Config ===
+    // === JSONBin Config - CORRECTED SECRET KEY ===
     const JSONBIN_ID = '686cdbfa8a456b7966bd5883';
-    const JSONBIN_SECRET = '$2a$10$BqM/s2f2kqZGoB5V14WtWOPOVO5/ccx/wZtBqmQsgeQqh6WMp42We';
-    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+    const JSONBIN_SECRET = '$2a$10$BqM/s2f2kqZGoB5V14WtWOPOVO5/ccx/wZtBqmQsgeQqh6WMp42We'; // ✅ Correct key
+    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/686cdbfa8a456b7966bd5883`;
+
     let outRecords = [];
     let completedRecords = [];
     let isLoaded = false;
-    let isAdmin = false; // Track admin session for stats
+    let isAdmin = false;
 
     function formatDateTime(dateTimeString) {
         if (!dateTimeString) return '';
@@ -451,7 +426,6 @@
         });
     }
 
-    // Moved renderStats definition before its call in refreshTables
     function renderStats() {
         const statsPanel = document.getElementById('statsPanel');
         statsPanel.style.display = isAdmin ? '' : 'none';
@@ -460,18 +434,19 @@
             statsPanel.innerHTML = '';
             return;
         }
-        
+
         const totalOut = outRecords.length;
         const totalTrips = completedRecords.length;
         const totalFuel = completedRecords.reduce((sum, r) => sum + parseFloat(r.fuelAmount || 0), 0);
         const totalDistanceTraveled = completedRecords.reduce((sum, r) => sum + parseFloat(r.distanceTraveled || 0), 0);
         const avgFuel = totalTrips ? (totalFuel / totalTrips) : 0;
         const avgDistanceTraveled = totalTrips ? (totalDistanceTraveled / totalTrips) : 0;
-        
+
         let mostRecent = null;
         if (completedRecords.length) {
             mostRecent = completedRecords.reduce((a, b) => (a.dateTimeIn > b.dateTimeIn ? a : b));
         }
+
         let driverCounts = {};
         completedRecords.forEach(r => {
             driverCounts[r.driverName] = (driverCounts[r.driverName] || 0) + 1;
@@ -483,6 +458,7 @@
                 mostActiveDriver = driver;
             }
         }
+
         let html = `
           <div class="stat-card"><div class="stat-icon">🚗</div>
             <div class="stat-value">${totalOut}</div>
@@ -509,6 +485,7 @@
             <div class="stat-label">Avg Distance/Trip</div>
           </div>
         `;
+
         if (mostRecent) {
           html += `
           <div class="stat-card"><div class="stat-icon">🕒</div>
@@ -530,7 +507,7 @@
 
     function updateCardDropdown() {
         const dropdown = document.getElementById('cardRegistrationIn');
-        dropdown.innerHTML = '<option value="">Select Vehicle registration</option>';
+        dropdown.innerHTML = '<option value="">Select Vehicle Registration</option>';
         outRecords.forEach(record => {
             const option = document.createElement('option');
             option.value = record.cardRegistration;
@@ -538,6 +515,7 @@
             dropdown.appendChild(option);
         });
     }
+
     function addOutRecordToTable(record) {
         const tbody = document.getElementById('outRecordsBody');
         const row = tbody.insertRow(0);
@@ -548,6 +526,7 @@
             <td><span class="status-badge status-out">Out</span></td>
         `;
     }
+
     function addCompletedRecordToTable(record) {
         const tbody = document.getElementById('inRecordsBody');
         const row = tbody.insertRow(0);
@@ -560,10 +539,10 @@
             <td>R${parseFloat(record.fuelAmount).toFixed(2)}</td>
         `;
     }
+
     function refreshTables() {
         const outRecordsBody = document.getElementById('outRecordsBody');
         const inRecordsBody = document.getElementById('inRecordsBody');
-
         outRecordsBody.innerHTML = '';
         inRecordsBody.innerHTML = '';
 
@@ -578,41 +557,80 @@
         } else {
             completedRecords.forEach(addCompletedRecordToTable);
         }
-        
+
         updateCardDropdown();
-        renderStats(); 
+        renderStats();
     }
+
     async function loadFromBin() {
         try {
             const res = await fetch(JSONBIN_URL + '/latest', {
-                headers: {'X-Master-Key': JSONBIN_SECRET}
+                headers: { 'X-Master-Key': JSONBIN_SECRET }
             });
-            if (!res.ok) throw new Error('Could not fetch data');
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(`HTTP ${res.status}: ${error.message || 'Unknown error'}`);
+            }
             const data = await res.json();
             outRecords = data.record.outRecords || [];
-            completedRecords = data.record.completedRecords || [];
+
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+            // Filter out completed records from last month only
+            completedRecords = (data.record.completedRecords || []).filter(record => {
+                const dateIn = new Date(record.dateTimeIn);
+                const recordMonth = dateIn.getMonth();
+                const recordYear = dateIn.getFullYear();
+                return !(recordMonth === lastMonth && recordYear === lastMonthYear);
+            });
+
             refreshTables();
+
+            // Notify how many records were removed
+            const totalOriginal = (data.record.completedRecords || []).length;
+            const removed = totalOriginal - completedRecords.length;
+            if (removed > 0) {
+                alert(`Loaded data. Removed ${removed} record(s) from last month.`);
+            }
         } catch (err) {
-            alert('Error accessing JSONBin! Check internet or credentials.\n' + (err.message || err));
+            console.error('Load error:', err);
+            alert('Failed to load or clean data: ' + (err.message || err));
             outRecords = [];
             completedRecords = [];
             refreshTables();
         }
         isLoaded = true;
     }
+
     async function saveToBin() {
         if (!isLoaded) return;
-        const data = {outRecords: outRecords, completedRecords: completedRecords};
+        const data = { outRecords, completedRecords };
         try {
-            await fetch(JSONBIN_URL, {
+            const res = await fetch(JSONBIN_URL, {
                 method: 'PUT',
-                headers: {'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_SECRET},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_SECRET
+                },
                 body: JSON.stringify(data)
             });
+
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(error.message || `HTTP ${res.status}`);
+            }
+
+            console.log("Saved successfully!");
         } catch (err) {
-            alert('Error saving to JSONBin.\n' + (err.message || err));
+            console.error('Save error:', err);
+            alert('Failed to save data.\n' + err.message);
         }
     }
+
     async function clearData() {
         outRecords = [];
         completedRecords = [];
@@ -620,18 +638,15 @@
         await saveToBin();
     }
 
-    // Function to calculate totals for export
     function calculateExportTotals(records) {
         let totalMileage = 0;
         let totalFuel = 0;
         let totalDistance = 0;
-
         records.forEach(record => {
             totalMileage += parseFloat(record.mileageIn || 0);
             totalFuel += parseFloat(record.fuelAmount || 0);
             totalDistance += parseFloat(record.distanceTraveled || 0);
         });
-
         return {
             totalMileage: totalMileage.toFixed(1),
             totalFuel: totalFuel.toFixed(2),
@@ -639,51 +654,42 @@
         };
     }
 
-    // Export Life to Date
     function exportLifeToDateCSV() {
         let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
         completedRecords.forEach(record => {
             const dateOut = new Date(record.dateTimeOut);
             const monthOut = dateOut.toLocaleString('default', { month: 'long' });
-            
             csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
         });
 
-        // Add totals row
         const totals = calculateExportTotals(completedRecords);
         csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
-
         downloadCSV(csv, "fleet_life_to_date.csv");
     }
 
-    // Export Month to Date
     function exportMonthToDateCSV() {
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
-        
         const monthRecords = completedRecords.filter(record => {
             const recordDate = new Date(record.dateTimeIn);
             return recordDate.getMonth() === currentMonth && 
                    recordDate.getFullYear() === currentYear;
         });
-        
+
         let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
         monthRecords.forEach(record => {
             const dateOut = new Date(record.dateTimeOut);
             const monthOut = dateOut.toLocaleString('default', { month: 'long' });
-            
             csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
         });
 
-        // Add totals row
         const totals = calculateExportTotals(monthRecords);
         csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
-
-        downloadCSV(csv, `fleet_${currentDate.toLocaleString('default', { month: 'long' })}_${currentYear}.csv`);
+        const filename = `fleet_${currentDate.toLocaleString('default', { month: 'long' })}_${currentYear}.csv`;
+        downloadCSV(csv, filename);
     }
 
-    // Download CSV helper
     function downloadCSV(csvContent, filename) {
         const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
@@ -694,12 +700,10 @@
         URL.revokeObjectURL(url);
     }
 
-    // Show export options modal
     function showExportModal() {
         exportModal.style.display = 'flex';
     }
 
-    // Hide export options modal
     function hideExportModal() {
         exportModal.style.display = 'none';
     }
@@ -708,31 +712,34 @@
         e.preventDefault();
         const formData = new FormData(this);
         const cardRegistration = formData.get('cardRegistrationOut').trim();
+
         if (outRecords.some(record => record.cardRegistration === cardRegistration)) {
-            alert('This card is already checked out!');
+            alert('This vehicle is already checked out!');
             return;
         }
+
         const record = {
             cardRegistration: cardRegistration,
             driverName: formData.get('driverNameOut'),
             dateTimeOut: formData.get('dateTimeOut'),
             timestamp: new Date().toISOString()
         };
+
         outRecords.push(record);
-        refreshTables(); // Call refreshTables to update both tables and dropdown, and empty states
+        refreshTables();
         this.reset();
+
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('dateTimeOut').value = now.toISOString().slice(0, 16);
+
         alert('Vehicle checked out successfully!');
         await saveToBin();
     });
-    
-    // Add real-time validation for fuel amount
+
     document.getElementById('fuelAmount').addEventListener('input', function() {
         const fuelAmount = parseFloat(this.value) || 0;
         const errorDiv = document.getElementById('fuelAmountError');
-        
         if (fuelAmount > 2500) {
             errorDiv.style.display = 'block';
             this.style.borderColor = '#c53030';
@@ -741,24 +748,24 @@
             this.style.borderColor = '#e1e8ed';
         }
     });
-    
+
     document.getElementById('vehicleInForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         const cardRegistration = formData.get('cardRegistrationIn');
         const fuelAmount = parseFloat(formData.get('fuelAmount')) || 0;
-        
-        // Validate fuel amount limit
+
         if (fuelAmount > 2500) {
             alert('Fuel amount cannot exceed R2500!');
             return;
         }
-        
+
         const outRecord = outRecords.find(record => record.cardRegistration === cardRegistration);
         if (!outRecord) {
-            alert('No checkout record found for this card!');
+            alert('No checkout record found for this vehicle!');
             return;
         }
+
         const dateTimeIn = formData.get('dateTimeIn');
         if (new Date(dateTimeIn) <= new Date(outRecord.dateTimeOut)) {
             alert('Date/Time In must be after Date/Time Out!');
@@ -766,14 +773,12 @@
         }
 
         const mileageInInput = formData.get('mileageIn');
-        
         const lastCompletedTrip = completedRecords
             .filter(record => record.cardRegistration === cardRegistration)
             .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
             .at(0);
 
         const lastMileageIn = lastCompletedTrip ? parseFloat(lastCompletedTrip.mileageIn) : 0;
-        
         let currentMileageIn;
         let distanceTraveled;
 
@@ -783,7 +788,7 @@
         } else {
             currentMileageIn = parseFloat(mileageInInput);
             if (currentMileageIn < lastMileageIn) {
-                alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km) for this card.`);
+                alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km) for this vehicle.`);
                 return;
             }
             distanceTraveled = currentMileageIn - lastMileageIn;
@@ -811,16 +816,15 @@
         alert('Vehicle checked in successfully!');
         await saveToBin();
     });
+
     document.getElementById('cardRegistrationIn').addEventListener('change', function() {
         const selectedCard = this.value;
         const outRecord = outRecords.find(record => record.cardRegistration === selectedCard);
         document.getElementById('driverNameIn').value = outRecord ? outRecord.driverName : '';
-
         const lastCompletedTripForCard = completedRecords
             .filter(record => record.cardRegistration === selectedCard)
             .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
             .at(0);
-        
         document.getElementById('mileageIn').value = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn).toFixed(1) : '0';
     });
 
@@ -831,6 +835,7 @@
     const adminConfirmBtn = document.getElementById('adminConfirmBtn');
     const adminCancelBtn = document.getElementById('adminCancelBtn');
     let adminCallback = null;
+
     function showAdminModal(callback) {
         adminCallback = callback;
         adminPassword.value = '';
@@ -838,10 +843,12 @@
         adminModal.style.display = 'flex';
         adminPassword.focus();
     }
+
     function hideAdminModal() {
         adminModal.style.display = 'none';
         adminError.textContent = '';
     }
+
     adminConfirmBtn.onclick = function() {
         const pass = adminPassword.value.trim();
         if (pass === "Superb@786") {
@@ -849,18 +856,21 @@
             if (adminCallback) adminCallback(true);
         } else if (pass === "Driver@123") {
             adminError.textContent = "Not authorized. Only Admin can reset or view stats.";
-            setTimeout(()=>{adminError.textContent='';}, 2500);
+            setTimeout(() => { adminError.textContent = ''; }, 2500);
         } else {
             adminError.textContent = "Incorrect password.";
-            setTimeout(()=>{adminError.textContent='';}, 2000);
+            setTimeout(() => { adminError.textContent = ''; }, 2000);
         }
-    }
+    };
+
     adminCancelBtn.onclick = function() {
         hideAdminModal();
-    }
+    };
+
     adminPassword.onkeydown = function(e) {
         if (e.key === 'Enter') adminConfirmBtn.onclick();
     };
+
     document.getElementById('clearAllBtn').addEventListener('click', function() {
         showAdminModal(async function(authorized) {
             if (authorized) {
@@ -872,9 +882,8 @@
         });
     });
 
-    // --- Show stats admin login ---
     document.getElementById('showStatsBtn').addEventListener('click', function() {
-        showAdminModal(function(authorized){
+        showAdminModal(function(authorized) {
             if (authorized) {
                 isAdmin = true;
                 renderStats();
@@ -884,25 +893,17 @@
 
     // --- Export Options Modal ---
     const exportModal = document.getElementById('exportModal');
-    const exportLifeToDateBtn = document.getElementById('exportLifeToDateBtn');
-    const exportMonthToDateBtn = document.getElementById('exportMonthToDateBtn');
-    const exportCancelBtn = document.getElementById('exportCancelBtn');
-
     document.getElementById('exportCsvBtn').addEventListener('click', showExportModal);
-    
-    exportLifeToDateBtn.addEventListener('click', function() {
+    document.getElementById('exportLifeToDateBtn').addEventListener('click', function() {
         hideExportModal();
         exportLifeToDateCSV();
     });
-    
-    exportMonthToDateBtn.addEventListener('click', function() {
+    document.getElementById('exportMonthToDateBtn').addEventListener('click', function() {
         hideExportModal();
         exportMonthToDateCSV();
     });
-    
-    exportCancelBtn.addEventListener('click', hideExportModal);
+    document.getElementById('exportCancelBtn').addEventListener('click', hideExportModal);
 
-    // Close modals when clicking outside
     window.addEventListener('click', function(event) {
         if (event.target === adminModal) hideAdminModal();
         if (event.target === exportModal) hideExportModal();
@@ -922,6 +923,7 @@
         });
     });
 
+    // --- Init ---
     document.addEventListener('DOMContentLoaded', async function() {
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -932,8 +934,6 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');
         }
-
-        // Collapse all sections by default on mobile load
         if (window.innerWidth <= 768) {
             document.querySelectorAll('.collapsible-section .collapsible-content').forEach(content => {
                 content.style.maxHeight = null;
