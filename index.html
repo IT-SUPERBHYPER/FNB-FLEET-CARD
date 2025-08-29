@@ -159,6 +159,13 @@
             margin-top: 5px;
             display: none;
         }
+        /* Mileage hint */
+        .mileage-hint {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
         /* Mobile Specific Optimizations */
         @media (max-width: 768px) {
             body {padding: 10px;}
@@ -320,6 +327,7 @@
                         <div class="form-group">
                             <label for="mileageIn"><span class="icon">📊</span>Mileage In (km)</label>
                             <input type="number" id="mileageIn" name="mileageIn" placeholder="0" min="0" step="0.1">
+                            <span id="mileageHint" class="mileage-hint" style="display:none;"></span>
                         </div>
                         <div class="form-group">
                             <label for="dateTimeIn"><span class="icon">🕐</span>Date & Time In</label>
@@ -408,7 +416,6 @@
     const JSONBIN_ID = '686cdbfa8a456b7966bd5883';
     const JSONBIN_SECRET = '$2a$10$BqM/s2f2kqZGoB5V14WtWOPOVO5/ccx/wZtBqmQsgeQqh6WMp42We'; // ✅ Correct key
     const JSONBIN_URL = `https://api.jsonbin.io/v3/b/686cdbfa8a456b7966bd5883`;
-
     let outRecords = [];
     let completedRecords = [];
     let isLoaded = false;
@@ -434,7 +441,6 @@
             statsPanel.innerHTML = '';
             return;
         }
-
         const totalOut = outRecords.length;
         const totalTrips = completedRecords.length;
         const totalFuel = completedRecords.reduce((sum, r) => sum + parseFloat(r.fuelAmount || 0), 0);
@@ -485,7 +491,6 @@
             <div class="stat-label">Avg Distance/Trip</div>
           </div>
         `;
-
         if (mostRecent) {
           html += `
           <div class="stat-card"><div class="stat-icon">🕒</div>
@@ -573,14 +578,12 @@
             }
             const data = await res.json();
             outRecords = data.record.outRecords || [];
-
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
             const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
             const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
 
-            // Filter out completed records from last month only
             completedRecords = (data.record.completedRecords || []).filter(record => {
                 const dateIn = new Date(record.dateTimeIn);
                 const recordMonth = dateIn.getMonth();
@@ -590,7 +593,6 @@
 
             refreshTables();
 
-            // Notify how many records were removed
             const totalOriginal = (data.record.completedRecords || []).length;
             const removed = totalOriginal - completedRecords.length;
             if (removed > 0) {
@@ -618,12 +620,10 @@
                 },
                 body: JSON.stringify(data)
             });
-
             if (!res.ok) {
                 const error = await res.json().catch(() => ({}));
                 throw new Error(error.message || `HTTP ${res.status}`);
             }
-
             console.log("Saved successfully!");
         } catch (err) {
             console.error('Save error:', err);
@@ -661,7 +661,6 @@
             const monthOut = dateOut.toLocaleString('default', { month: 'long' });
             csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
         });
-
         const totals = calculateExportTotals(completedRecords);
         csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
         downloadCSV(csv, "fleet_life_to_date.csv");
@@ -676,14 +675,12 @@
             return recordDate.getMonth() === currentMonth && 
                    recordDate.getFullYear() === currentYear;
         });
-
         let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
         monthRecords.forEach(record => {
             const dateOut = new Date(record.dateTimeOut);
             const monthOut = dateOut.toLocaleString('default', { month: 'long' });
             csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
         });
-
         const totals = calculateExportTotals(monthRecords);
         csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
         const filename = `fleet_${currentDate.toLocaleString('default', { month: 'long' })}_${currentYear}.csv`;
@@ -712,27 +709,22 @@
         e.preventDefault();
         const formData = new FormData(this);
         const cardRegistration = formData.get('cardRegistrationOut').trim();
-
         if (outRecords.some(record => record.cardRegistration === cardRegistration)) {
             alert('This vehicle is already checked out!');
             return;
         }
-
         const record = {
             cardRegistration: cardRegistration,
             driverName: formData.get('driverNameOut'),
             dateTimeOut: formData.get('dateTimeOut'),
             timestamp: new Date().toISOString()
         };
-
         outRecords.push(record);
         refreshTables();
         this.reset();
-
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('dateTimeOut').value = now.toISOString().slice(0, 16);
-
         alert('Vehicle checked out successfully!');
         await saveToBin();
     });
@@ -749,6 +741,7 @@
         }
     });
 
+    // Enhanced vehicle in form with mileage confirmation
     document.getElementById('vehicleInForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -773,26 +766,38 @@
         }
 
         const mileageInInput = formData.get('mileageIn');
-        const lastCompletedTrip = completedRecords
+        if (!mileageInInput || isNaN(parseFloat(mileageInInput))) {
+            alert('Please enter a valid Mileage In value.');
+            return;
+        }
+
+        const currentMileageIn = parseFloat(mileageInInput);
+
+        // Get last recorded mileage
+        const lastCompletedTripForCard = completedRecords
             .filter(record => record.cardRegistration === cardRegistration)
             .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
             .at(0);
+        const lastMileageIn = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn) : 0;
 
-        const lastMileageIn = lastCompletedTrip ? parseFloat(lastCompletedTrip.mileageIn) : 0;
-        let currentMileageIn;
-        let distanceTraveled;
-
-        if (!mileageInInput || parseFloat(mileageInInput) === 0) {
-            currentMileageIn = lastMileageIn;
-            distanceTraveled = 0;
-        } else {
-            currentMileageIn = parseFloat(mileageInInput);
-            if (currentMileageIn < lastMileageIn) {
-                alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km) for this vehicle.`);
-                return;
-            }
-            distanceTraveled = currentMileageIn - lastMileageIn;
+        // Prevent backward mileage
+        if (currentMileageIn < lastMileageIn) {
+            alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km).`);
+            return;
         }
+
+        // Confirm if mileage is significantly different
+        const tolerance = 100; // km — adjust as needed
+        if (lastMileageIn > 0 && Math.abs(currentMileageIn - lastMileageIn) > tolerance) {
+            const confirm = window.confirm(
+                `The last recorded mileage for this vehicle was ${lastMileageIn} km.\n` +
+                `You entered ${currentMileageIn} km.\n\n` +
+                `Is this correct? Click "OK" to confirm or "Cancel" to review.`
+            );
+            if (!confirm) return; // Cancel submission
+        }
+
+        const distanceTraveled = currentMileageIn - lastMileageIn;
 
         const completedRecord = {
             ...outRecord,
@@ -806,13 +811,16 @@
 
         outRecords = outRecords.filter(record => record.cardRegistration !== cardRegistration);
         completedRecords.push(completedRecord);
+
         refreshTables();
         this.reset();
         document.getElementById('driverNameIn').value = '';
         document.getElementById('mileageIn').value = '';
+        document.getElementById('mileageHint').style.display = 'none';
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('dateTimeIn').value = now.toISOString().slice(0, 16);
+
         alert('Vehicle checked in successfully!');
         await saveToBin();
     });
@@ -821,11 +829,24 @@
         const selectedCard = this.value;
         const outRecord = outRecords.find(record => record.cardRegistration === selectedCard);
         document.getElementById('driverNameIn').value = outRecord ? outRecord.driverName : '';
+
         const lastCompletedTripForCard = completedRecords
             .filter(record => record.cardRegistration === selectedCard)
             .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
             .at(0);
-        document.getElementById('mileageIn').value = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn).toFixed(1) : '0';
+        const lastMileageIn = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn) : 0;
+
+        const mileageInput = document.getElementById('mileageIn');
+        const hint = document.getElementById('mileageHint');
+
+        if (lastMileageIn > 0) {
+            hint.textContent = `Last recorded: ${lastMileageIn} km`;
+            hint.style.display = 'block';
+            mileageInput.value = lastMileageIn.toFixed(1);
+        } else {
+            hint.style.display = 'none';
+            mileageInput.value = '0';
+        }
     });
 
     // --- Modal logic ---
