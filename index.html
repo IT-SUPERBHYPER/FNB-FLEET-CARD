@@ -1,1368 +1,968 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Superb Hyper – Daily Water Readings (Cloud)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#2870ea">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <style>
-    /* Existing styles remain unchanged */
-    html { box-sizing: border-box; }
-    *, *:before, *:after { box-sizing: inherit; }
-    :root {
-      --primary: #2870ea;
-      --primary-dark: #1851b8;
-      --success: #1e843b;
-      --danger: #e62739;
-      --accent: #ffa502;
-      --bg-main: #f5fafd;
-      --card-bg: #fff;
-      --text-main: #183d5c;
-      --shadow: 0 4px 24px rgba(40, 112, 234, 0.10);
-      --radius: 18px;
-      --bowser: #2870ea;
-      --dip: #ffa502;
-      --ilembe: #23c181;
-      --hydrant: #e62739;
-      --avatar-bg: #f3f7fa;
-    }
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      background: var(--bg-main);
-      margin: 0; padding: 0; min-height: 100vh;
-      color: var(--text-main);
-      transition: background .3s, color .3s;
-    }
-    .dark {
-      --bg-main: #212838;
-      --card-bg: #232d40;
-      --text-main: #e9f2ff;
-      --success: #3dcb60;
-      --danger: #ff6179;
-      --accent: #ffc752;
-      --shadow: 0 4px 36px rgba(40,112,234,0.12);
-      --avatar-bg: #364053;
-    }
-    .container {
-      background: var(--card-bg);
-      max-width: 700px;
-      margin: 36px auto 28px auto;
-      padding: 32px 20px 24px 20px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      animation: fadeIn 0.8s cubic-bezier(.57,.21,.69,1.25);
-    }
-    h1 {
-      text-align: center;
-      color: var(--primary);
-      margin-bottom: 12px;
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 1.2px;
-      text-shadow: 0 2px 8px #eaf2fa;
-    }
-    .brand {
-      text-align: center;
-      color: var(--primary-dark);
-      font-size: 1.17rem;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      margin-bottom: 16px;
-    }
-    .top-bar {
-      display: flex; gap: 11px; justify-content: flex-end; align-items: center; margin-bottom: 11px; flex-wrap: wrap;
-    }
-    .export-btn, .stat-btn, .chart-btn, .backup-btn, .restore-btn, .dark-btn, .admin-btn {
-      border: none;
-      border-radius: 11px;
-      font-weight: 700;
-      font-family: inherit;
-      padding: 9px 16px;
-      font-size: 1.04em;
-      cursor: pointer;
-      margin-bottom: 4px;
-      margin-right: 2px;
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 2px 10px rgba(40,112,234,0.10);
-      transition: background .16s, color .17s, box-shadow .14s;
-      outline: none;
-    }
-    .stat-btn { background: var(--accent); color: var(--text-main);}
-    .stat-btn:hover { background: #ffd66b; color: var(--primary-dark);}
-    .chart-btn { background: var(--bowser);}
-    .chart-btn:hover { background: var(--primary-dark);}
-    .backup-btn, .restore-btn { background: var(--success);}
-    .backup-btn:hover, .restore-btn:hover { background: #156328;}
-    .admin-btn { background: var(--danger);}
-    .admin-btn:hover { background: #ad1b29;}
-    .dark-btn { background: var(--card-bg); color: var(--primary);}
-    .dark-btn:hover { background: var(--primary); color: #fff;}
-    @media (max-width: 700px) { .top-bar { flex-direction: column; align-items: stretch; gap: 7px;} }
-    .form-row { margin-bottom: 17px; }
-    label { font-weight: 600; color: var(--primary); display: block; margin-bottom: 6px;}
-    .row {
-      display: flex; gap: 10px; margin-bottom: 7px; align-items: center;
-      background: #f7fafd;
-      border-radius: 8px;
-      padding: 7px 0 7px 0;
-    }
-    .dark .row { background: #242c3c; }
-    .row input[type="number"] {
-      width: 110px;
-      min-width: 110px;
-      padding: 8px 10px;
-      border: 1px solid #e2e6ed;
-      border-radius: 8px;
-      font-size: 1.1em;
-      text-align: right;
-      background: #f6fafd;
-      color: var(--text-main);
-      box-shadow: 0 1px 2px #eaf2fa;
-      transition: all 0.14s ease;
-    }
-    .row input[type="number"]:focus {
-      border: 1.7px solid var(--primary);
-      outline: none;
-      box-shadow: 0 1px 4px rgba(40,112,234,0.2);
-    }
-    .row .diff {
-      font-weight: 700; color: var(--success); min-width: 54px; text-align: right;
-      font-size: 1.07em; letter-spacing: 1.2px;
-    }
-    textarea, input[type="text"], input[type="date"] {
-      width: 100%; border-radius: 8px; border: 1px solid #e2e6ed; font-size: 1.04em; padding: 10px 9px; background: #f7fafd;
-      margin-top: 5px; transition: border 0.14s;
-      box-shadow: 0 1px 3px #eaf2fa;
-      color: var(--text-main);
-    }
-    textarea:focus, input[type="text"]:focus, input[type="date"]:focus {
-      border: 1.7px solid var(--primary);
-      outline: none;
-    }
-    button[type="submit"], .cancel-edit-btn {
-      width: 100%;
-      background: var(--primary);
-      color: #fff;
-      padding: 14px 0;
-      margin-top: 13px;
-      font-weight: 700;
-      border-radius: 11px;
-      border: none;
-      font-size: 1.11em;
-      box-shadow: 0 2px 13px #eaf2fa;
-      letter-spacing: 0.5px;
-      transition: background 0.17s, box-shadow 0.16s;
-    }
-    button[type="submit"]:hover:not(:disabled) { background: var(--primary-dark);}
-    button[type="submit"]:disabled { background: #b1c7f4; cursor: not-allowed;}
-    .cancel-edit-btn { background: #888; margin-top: 6px;}
-    .cancel-edit-btn:hover { background: #444;}
-    .loader, .saving-spinner {
-      text-align: center;
-      margin-top: 27px;
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    .saving-spinner {
-      display: inline-block;
-      margin: 0 7px 0 7px;
-      vertical-align: middle;
-      width: 22px; height: 22px;
-      border: 3px solid #e6e9f5; border-top: 3px solid var(--primary);
-      border-radius: 50%; animation: spin 1.1s linear infinite;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .success-msg, .error-msg {
-      color: #fff; border-radius: 8px; padding: 8px 0; text-align: center;
-      margin-bottom: 11px; font-weight: 600; box-shadow: 0 1px 7px #eaf2fa;
-      letter-spacing: .5px;
-      animation: fadeInMsg .4s;
-    }
-    .success-msg { background: var(--success);}
-    .error-msg   { background: var(--danger);}
-    @keyframes fadeInMsg { from { opacity:0; transform:translateY(-10px);} to {opacity:1;transform:none;} }
-    .history-section { overflow-x: auto; width: 100%; }
-    .history-table {
-      width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 1em;
-      background: #fafcff;
-      border-radius: 10px;
-      box-shadow: 0 1px 7px #eaf2fa;
-      min-width: 800px;
-    }
-    .dark .history-table { background: #232d40;}
-    .history-table th, .history-table td {
-      padding: 8px 6px; text-align: center; border-bottom: 1px solid #e5eaf3;
-      position: relative;
-    }
-    .history-table th {
-      background: #f0f6ff; font-weight: 700; color: var(--primary);
-      border-bottom: 2.5px solid #e0e6f2;
-      cursor: help;
-      position: relative;
-    }
-    .history-table tr:hover { background: #f3f8ff;}
-    .dark .history-table tr:hover { background: #232d40;}
-    .action-btn {
-      background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1.12em; margin: 0 1px;
-      padding: 0 3px; font-weight: 700; transition: color 0.13s;
-    }
-    .action-btn:hover { color: var(--danger);}
-    .avatar {
-      display: inline-block;
-      background: var(--avatar-bg);
-      color: var(--primary-dark);
-      border-radius: 50%;
-      width: 28px; height: 28px; line-height: 28px;
-      font-size: 1.06em; font-weight: 700;
-      vertical-align: middle;
-      margin-right: 3px;
-      box-shadow: 0 1px 2px #eaf2fa;
-    }
-    @media (max-width: 1000px) {
-      .history-section { overflow-x: auto; }
-      .history-table { min-width: 650px; }
-    }
-    @media (max-width: 700px) {
-      .container { padding: 8px 1vw; }
-      h1 { font-size: 1.11rem; }
-      .row input[type="number"] { width: 70px; min-width: 70px; font-size: 1.04em; padding: 6px 8px; }
-      .brand { font-size: .97rem; }
-    }
-    @media print {
-      .container, .top-bar, .history-section, .history-table { box-shadow:none !important; }
-      .top-bar, .stat-modal, .chart-modal, .admin-popup, .dark-btn, .export-modal, .custom-modal { display:none !important;}
-      body { background: #fff !important; color: #111 !important;}
-    }
-    .stat-modal, .chart-modal, .admin-popup, .restore-modal, .export-modal, .custom-modal {
-      display: none; position: fixed; z-index: 1001;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(40,112,234,0.13);
-      justify-content: center; align-items: center;
-      transition: background 0.14s;
-    }
-    .stat-modal.active, .chart-modal.active, .admin-popup.active, .restore-modal.active, .export-modal.active, .custom-modal.active { display: flex; }
-    .stat-panel, .chart-panel, .admin-panel, .restore-panel, .export-panel, .custom-panel {
-      background: #fff; border-radius: 18px; box-shadow: 0 8px 48px rgba(40,112,234,0.13), 0 1px 16px #eaf2fa;
-      padding: 29px 22px 22px 22px; max-width: 540px; width: 97vw;
-      max-height: 92vh; overflow-y: auto; color: var(--text-main);
-      animation: popupIn .4s cubic-bezier(.51,.13,.36,1.16); position: relative;
-    }
-    .dark .stat-panel, .dark .chart-panel, .dark .admin-panel, .dark .restore-panel, .dark .export-panel, .dark .custom-panel { background: #222b3a; color: #e9f2ff; }
-    .stat-title, .chart-title, .admin-title, .restore-title, .export-title, .custom-title {
-      font-weight: 900; color: var(--primary); font-size: 1.19rem; margin-bottom: 12px;
-      text-align: center; letter-spacing: 1px; text-shadow: 0 2px 8px #eaf2fa;
-    }
-    .close-btn {
-      position: absolute; right: 11px; top: 9px; font-size: 2em; color: var(--danger);
-      background: none; border: none; cursor: pointer; font-weight: 900; padding: 2px 8px;
-      transition: color 0.15s;
-    }
-    .close-btn:hover { color: #ad1b29;}
-    .tooltip {
-      display:none; position: absolute; z-index:1002; padding: 5px 10px; background: #fff; border:1px solid #e2eaf2;
-      color:#222; font-size:.99em; font-weight:500; border-radius:6px; box-shadow:0 1px 6px #eaf2fa;
-      max-width: 230px; left: 50%; transform: translateX(-50%); top: 140%;
-      pointer-events:none; white-space: pre-line;
-    }
-    .history-table th:hover .tooltip { display: block;}
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(24px);} to   { opacity: 1; transform: translateY(0);} }
-    @keyframes popupIn { from { opacity: 0; transform: scale(0.89);} to   { opacity: 1; transform: scale(1);} }
-    /* Floating Value Display */
-    .floating-value {
-      position: fixed;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 14px;
-      z-index: 1000;
-      pointer-events: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      color: #333;
-      display: none;
-    }
-    .dark .floating-value {
-      background: rgba(35, 45, 64, 0.9);
-      color: #e9f2ff;
-      border-color: #4a5a7a;
-    }
-    /* Export Options Styles */
-    .export-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    .export-option {
-      background: #f7fafd;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-      border: 2px solid transparent;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    .dark .export-option {
-      background: #2a3344;
-    }
-    .export-option:hover {
-      border-color: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(40,112,234,0.15);
-    }
-    .export-option h3 {
-      margin: 0 0 10px 0;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-    .export-option p {
-      margin: 0 0 15px 0;
-      font-size: 0.9rem;
-      color: var(--text-main);
-    }
-    .format-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-    .format-btn {
-      padding: 8px 15px;
-      border-radius: 8px;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .csv-format {
-      background: var(--success);
-      color: white;
-    }
-    .csv-format:hover {
-      background: #156328;
-    }
-    .pdf-format {
-      background: var(--danger);
-      color: white;
-    }
-    .pdf-format:hover {
-      background: #ad1b29;
-    }
-    /* Date Range Picker Styles */
-    .date-range-container {
-      margin: 15px 0;
-    }
-    .date-range-row {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    .date-range-row > div {
-      flex: 1;
-    }
-    .date-range-row label {
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 5px;
-      display: block;
-    }
-    .date-range-row input[type="date"] {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #e2e6ed;
-      border-radius: 8px;
-      background: #f7fafd;
-      color: var(--text-main);
-    }
-    .date-range-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNB Fleet Cards Record</title>
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.png" sizes="192x192">
+    <style>
+        /* General styles */
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Arial',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;}
+        .container{max-width:800px;margin:0 auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);overflow:hidden;}
+        /* Header */
+        .header{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;padding:30px;text-align:center;position:relative;}
+        .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');pointer-events:none;}
+        .header h1{font-size:2.5em;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+        .header p{font-size:1.1em;opacity:0.9;position:relative;z-index:1;}
+        /* Form & Content Containers */
+        .form-container{padding:40px;}
+        .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-bottom:30px;}
+        .form-group{position:relative;}
+        .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:1em;text-transform:uppercase;letter-spacing:0.5px;}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:18px;border:2px solid #e1e8ed;border-radius:10px;font-size:1em;background:rgba(255,255,255,0.9);transition:all 0.3s ease;outline:none;}
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1);transform:translateY(-2px);}
+        .form-group input[type="datetime-local"]{font-family:inherit;}
+        .fuel-amount{position:relative;}
+        .fuel-amount::before{content:'R';position:absolute;left:15px;top:50%;transform:translateY(-50%);font-weight:bold;color:#667eea;z-index:1;}
+        .fuel-amount input{padding-left:35px;}
+        /* Section Headers */
+        .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3); cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
+        .section-header h2{font-size:1.5em;margin:0;font-weight:600;}
+        .section-header:first-child{margin-top:0;}
+        /* Accordion caret */
+        .section-header .caret {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+        .section-header.active .caret {
+            transform: rotate(90deg);
+        }
+        /* Collapsible content */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 20px;
+            background: rgba(248,250,252,0.8);
+            border-radius: 0 0 15px 15px;
+            border: 2px solid #e2e8f0;
+            border-top: none;
+            margin: 0 -40px;
+        }
+        .collapsible-content.active {
+            max-height: 1000px;
+            padding: 20px 40px;
+        }
+        .collapsible-content form {
+            padding: 0;
+            margin-bottom: 0;
+        }
+        .collapsible-content .submit-section {
+            margin-bottom: 0;
+        }
+        /* Specific section styles */
+        .out-records,.in-records{margin-top:30px;padding:20px;background:rgba(248,250,252,0.8);border-radius:15px;border:2px solid #e2e8f0;}
+        .out-records h3,.in-records h3{color:#2c5282;margin-bottom:15px;font-size:1.2em;}
+        /* Status Badges */
+        .status-badge{padding:5px 12px;border-radius:20px;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+        .status-out{background:#fed7d7;color:#c53030;}
+        .status-complete{background:#c6f6d5;color:#2f855a;}
+        /* Submit Button */
+        .submit-section{text-align:center;margin-top:40px;}
+        .submit-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px 45px;border:none;border-radius:50px;font-size:1.1em;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:1px;box-shadow:0 10px 30px rgba(102,126,234,0.3);}
+        .submit-btn:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(102,126,234,0.4);}
+        .submit-btn:active{transform:translateY(-1px);}
+        /* Records Tables */
+        .records-section{margin-top:50px;padding-top:30px;border-top:2px solid #e1e8ed;}
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 20px;
+        }
+        .records-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+        .records-table th,.records-table td{padding:16px;text-align:left;border-bottom:1px solid #e1e8ed;font-size:0.95em;}
+        .records-table th{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+        .records-table tr:hover{background:rgba(102,126,234,0.05);}
+        .empty-table-message {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        /* Icons & Data Tools */
+        .icon{display:inline-block;margin-right:8px;opacity:0.7;}
+        .data-tools{text-align:right;margin-top:10px;margin-bottom:-10px;}
+        .data-tools button{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;margin-left:8px;cursor:pointer;transition:background 0.3s;}
+        .data-tools button:hover{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
+        /* Stats Panel */
+        .stats-panel {
+          display: flex; flex-wrap: wrap; gap: 18px; margin: 25px 0 32px 0; justify-content: center;
+        }
+        .stat-card {
+          background: linear-gradient(135deg,#e9e9fd 60%,#f6eafc 100%);
+          border-radius: 18px;
+          padding: 18px 22px;
+          box-shadow: 0 4px 12px rgba(80, 110, 200, 0.11);
+          min-width: 140px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .stat-icon {
+          font-size: 2em;
+          margin-bottom: 7px;
+          opacity: 0.86;
+        }
+        .stat-value {
+          font-size: 1.45em;
+          font-weight: bold;
+          color: #34387a;
+        }
+        .stat-label {
+          font-size: 0.96em;
+          color: #595b7a;
+          margin-top: 2px;
+          text-align: center;
+        }
+        /* Modal Styles */
+        .modal {
+            display:none;position:fixed;z-index:999;left:0;top:0;width:100vw;height:100vh;
+            background:rgba(30,44,74,0.45);justify-content:center;align-items:center;
+        }
+        .modal-content {
+            background:#fff;padding:32px 28px 20px 28px;border-radius:14px;max-width:340px;text-align:center;
+            box-shadow:0 2px 16px rgba(30,44,74,0.20);
+        }
+        .modal-content input[type="password"] {
+            width:90%;padding:12px;margin:18px 0 20px 0;border:1.5px solid #ddd;border-radius:8px;font-size:1.08em;
+        }
+        .modal-content button {
+            background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:#fff;border:none;border-radius:18px;
+            padding:9px 22px;font-size:1em;font-weight:600;margin:0 8px;cursor:pointer;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .modal-content button:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
+        .modal-content .error {color:#c53030;font-size:0.96em;margin-bottom:8px;}
+        .show-stats-btn {
+            background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);
+            color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;cursor:pointer;transition:background 0.3s; margin-bottom:16px;
+        }
+        .show-stats-btn:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
+        /* Error message for fuel amount */
+        .fuel-error {
+            color: #c53030;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        /* Mileage hint */
+        .mileage-hint {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
+        /* Mobile Specific Optimizations */
+        @media (max-width: 768px) {
+            body {padding: 10px;}
+            .container {border-radius: 10px;}
+            .form-container {padding: 15px;}
+            .header {padding: 20px;}
+            .header h1 {font-size: 1.8em;}
+            .header p {font-size: 1em;}
+            .form-grid {grid-template-columns: 1fr; gap: 20px;}
+            .section-header {margin: 20px -15px; padding: 15px;}
+            .section-header h2 {font-size: 1.3em;}
+            /* Table to Card Transformation */
+            .records-table, .records-table thead, .records-table tbody, .records-table th, .records-table td, .records-table tr {
+                display: block;
+                width: 100%;
+            }
+            .records-table thead {
+                display: none;
+            }
+            .records-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #e1e8ed;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                overflow: hidden;
+            }
+            .records-table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+                border-bottom: 1px dashed #e1e8ed;
+                font-size: 0.9em;
+            }
+            .records-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+            #outRecordsTable td:nth-of-type(1)::before { content: "Vehicle Reg.:"; }
+            #outRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
+            #outRecordsTable td:nth-of-type(3)::before { content: "Date/Time Out:"; }
+            #outRecordsTable td:nth-of-type(4)::before { content: "Status:"; }
+            #inRecordsTable td:nth-of-type(1)::before { content: "Vehicle Reg.:"; }
+            #inRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
+            #inRecordsTable td:nth-of-type(3)::before { content: "Date Out:"; }
+            #inRecordsTable td:nth-of-type(4)::before { content: "Date In:"; }
+            #inRecordsTable td:nth-of-type(5)::before { content: "Distance Traveled:"; }
+            #inRecordsTable td:nth-of-type(6)::before { content: "Fuel Amount:"; }
+            .records-table td:last-child {
+                border-bottom: 0;
+            }
+            .data-tools button, .show-stats-btn {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+            .data-tools {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+            }
+            .stats-panel {
+                gap: 10px;
+                margin: 15px 0 20px 0;
+            }
+            .stat-card {
+                min-width: 100px;
+                padding: 10px 5px;
+            }
+            .stat-icon {
+                font-size: 1.5em;
+            }
+            .stat-value {
+                font-size: 1.1em;
+            }
+            .stat-label {
+                font-size: 0.85em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Daily Water Readings (Cloud)</h1>
-    <div class="brand">Superb Hyper</div>
-    <div id="msg"></div>
-    <div class="top-bar">
-      <button class="export-btn" onclick="openExportModal()" title="Export Data">Export Data</button>
-      <button class="stat-btn" onclick="showStats()" title="Stats & Analytics">View Stats</button>
-      <button class="chart-btn" onclick="showChart()" title="Charts & Trends">Show Chart</button>
-      <button class="backup-btn" onclick="backupJSON()" title="Backup Data (JSON)">Backup</button>
-      <button class="restore-btn" onclick="openRestore()" title="Restore Backup">Restore</button>
-      <button class="admin-btn" onclick="showAdminPopup()" title="Admin Features">&#9881; Admin</button>
-      <button class="dark-btn" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" title="Toggle Dark Mode">🌙</button>
+<div class="container">
+    <div class="header">
+        <h1>🚗 FNB Fleet Cards Record</h1>
+        <p>Vehicle Usage & Fuel Tracking System</p>
     </div>
-    <form id="readingsForm" autocomplete="off">
-      <div class="form-row">
-        <label for="readingDate">Date</label>
-        <input type="date" id="readingDate" required>
-      </div>
-      <div class="section">
-        <label>Bowser Reading</label>
-        <div class="row">
-          <span>Open</span>
-          <input type="number" id="bowserOpen" required oninput="calcDiff('bowser')" aria-label="Bowser Opening">
-          <span>Close</span>
-          <input type="number" id="bowserClose" required oninput="calcDiff('bowser')" aria-label="Bowser Closing">
-          <span class="diff" id="bowserDiff">-</span>
+    <div class="form-container">
+        <div class="collapsible-section">
+            <div class="section-header" id="statsHeader">
+                <h2>📊 Stats & Admin Tools</h2>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <button class="show-stats-btn" id="showStatsBtn" type="button">Show Stats (Admin Only)</button>
+                <div class="stats-panel" id="statsPanel" style="display:none"></div>
+                <div class="data-tools">
+                    <button id="exportCsvBtn">Export CSV</button>
+                    <button id="clearAllBtn">Clear All Data</button>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="section">
-        <label>Dipstick</label>
-        <div class="row">
-          <span>Open</span>
-          <input type="number" id="dipOpen" required oninput="calcDiff('dip')" aria-label="Dipstick Opening">
-          <span>Close</span>
-          <input type="number" id="dipClose" required oninput="calcDiff('dip')" aria-label="Dipstick Closing">
-          <span class="diff" id="dipDiff">-</span>
+        <div class="collapsible-section">
+            <div class="section-header" id="checkoutHeader">
+                <h2>🚗 Vehicle Check Out</h2>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <form id="vehicleOutForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cardRegistrationOut"><span class="icon">💳</span>Vehicle Registration</label>
+                            <input type="text" id="cardRegistrationOut" name="cardRegistrationOut" required placeholder="Enter Vehicle registration number">
+                        </div>
+                        <div class="form-group">
+                            <label for="driverNameOut"><span class="icon">👤</span>Name of Driver</label>
+                            <input type="text" id="driverNameOut" name="driverNameOut" required placeholder="Enter driver's full name">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="dateTimeOut"><span class="icon">🕐</span>Date & Time Out</label>
+                            <input type="datetime-local" id="dateTimeOut" name="dateTimeOut" required>
+                        </div>
+                    </div>
+                    <div class="submit-section">
+                        <button type="submit" class="submit-btn">🚗 Check Out Vehicle</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
-      <div class="section">
-        <label>iLembe Water</label>
-        <div class="row">
-          <span>Open</span>
-          <input type="number" id="ilembeOpen" required oninput="calcDiff('ilembe')" aria-label="iLembe Opening">
-          <span>Close</span>
-          <input type="number" id="ilembeClose" required oninput="calcDiff('ilembe')" aria-label="iLembe Closing">
-          <span class="diff" id="ilembeDiff">-</span>
+        <div class="collapsible-section">
+            <div class="section-header" id="checkinHeader">
+                <h2>🏠 Vehicle Check In</h2>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <form id="vehicleInForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cardRegistrationIn"><span class="icon">💳</span>Vehicle Registration</label>
+                            <select id="cardRegistrationIn" name="cardRegistrationIn" required>
+                                <option value="">Select Vehicle Registration</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverNameIn"><span class="icon">👤</span>Driver Name</label>
+                            <input type="text" id="driverNameIn" name="driverNameIn" readonly placeholder="Auto-filled from checkout">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="mileageIn"><span class="icon">📊</span>Mileage In (km)</label>
+                            <input type="number" id="mileageIn" name="mileageIn" placeholder="0" min="0" step="0.1">
+                            <span id="mileageHint" class="mileage-hint" style="display:none;"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateTimeIn"><span class="icon">🕐</span>Date & Time In</label>
+                            <input type="datetime-local" id="dateTimeIn" name="dateTimeIn" required>
+                        </div>
+                    </div>
+                    <div class="form-group fuel-amount">
+                        <label for="fuelAmount"><span class="icon">⛽</span>Fuel Slip Amount (Max: R2500)</label>
+                        <input type="number" id="fuelAmount" name="fuelAmount" placeholder="0.00" min="0" max="2500" step="0.01">
+                        <div id="fuelAmountError" class="fuel-error">Fuel amount cannot exceed R2500</div>
+                    </div>
+                    <div class="submit-section">
+                        <button type="submit" class="submit-btn">🏠 Check In Vehicle</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
-      <div class="section">
-        <label>Hydrant</label>
-        <div class="row">
-          <span>Open</span>
-          <input type="number" id="hydrantOpen" required oninput="calcDiff('hydrant')" aria-label="Hydrant Opening">
-          <span>Close</span>
-          <input type="number" id="hydrantClose" required oninput="calcDiff('hydrant')" aria-label="Hydrant Closing">
-          <span class="diff" id="hydrantDiff">-</span>
+        <div class="collapsible-section">
+            <div class="section-header" id="outRecordsHeader">
+                <h3>🚗 Vehicles Currently Out</h3>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="table-responsive">
+                    <table class="records-table" id="outRecordsTable">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Reg.</th>
+                                <th>Driver</th>
+                                <th>Date/Time Out</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="outRecordsBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-      <div>
-        <label class="mini-label" for="countedBy">Counted By</label>
-        <input type="text" id="countedBy" maxlength="50" required placeholder="Name of person who counted" aria-label="Counted By">
-      </div>
-      <!-- Removed Checked By Field -->
-      <div>
-        <label class="note-label" for="notes">Notes</label>
-        <textarea id="notes" placeholder="Add any notes here..." aria-label="Notes"></textarea>
-      </div>
-      <button type="submit" id="saveBtn">Save Reading</button>
-      <button type="button" id="cancelEditBtn" class="cancel-edit-btn" style="display:none;" onclick="cancelEdit()">Cancel Edit</button>
-    </form>
-    <div id="loader" class="loader" style="display:none;">Loading history...</div>
-    <div class="history-section" id="historySection"></div>
-  </div>
-  <!-- Floating Value Display -->
-  <div id="floatingValue" class="floating-value"></div>
-  <!-- Stats Popup -->
-  <div class="stat-modal" id="statModal">
-    <div class="stat-panel" id="statPanel">
-      <button class="close-btn" onclick="closeStats()" title="Close">&times;</button>
-      <div class="stat-title">Summary Stats</div>
-      <div id="statsContent"></div>
+        <div class="collapsible-section">
+            <div class="section-header" id="inRecordsHeader">
+                <h3>🏠 Completed Trips</h3>
+                <span class="caret">▶</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="table-responsive">
+                    <table class="records-table" id="inRecordsTable">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Reg.</th>
+                                <th>Driver</th>
+                                <th>Date Out</th>
+                                <th>Date In</th>
+                                <th>Distance Traveled</th>
+                                <th>Fuel Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inRecordsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <!-- Chart Popup -->
-  <div class="chart-modal" id="chartModal">
-    <div class="chart-panel" id="chartPanel">
-      <button class="close-btn" onclick="closeChart()" title="Close">&times;</button>
-      <div class="chart-title">Usage Chart</div>
-      <div class="chart-controls">
-        <div class="chart-type-group">
-          <button class="chart-type-btn selected" id="btnLine" onclick="setChartType('line')" type="button">Line</button>
-          <button class="chart-type-btn" id="btnBar" onclick="setChartType('bar')" type="button">Bar</button>
-          <button class="chart-type-btn" id="btnStacked" onclick="setChartType('stacked')" type="button">Stacked Bar</button>
-          <button class="chart-type-btn" id="btnPie" onclick="setChartType('pie')" type="button">Pie</button>
-        </div>
-        <div>
-          <label class="series-label bowser">
-            <input class="series-toggle" type="checkbox" id="showBowser" checked onchange="updateChart()"/> Bowser
-          </label>
-          <label class="series-label dip">
-            <input class="series-toggle" type="checkbox" id="showDip" checked onchange="updateChart()"/> Dipstick
-          </label>
-          <label class="series-label ilembe">
-            <input class="series-toggle" type="checkbox" id="showIlembe" checked onchange="updateChart()"/> iLembe
-          </label>
-          <label class="series-label hydrant">
-            <input class="series-toggle" type="checkbox" id="showHydrant" checked onchange="updateChart()"/> Hydrant
-          </label>
-          <label class="series-label">
-            <input class="series-toggle" type="checkbox" id="showTotal" onchange="updateChart()"/> Daily Total
-          </label>
-        </div>
-      </div>
-      <canvas id="chartCanvas"></canvas>
+</div>
+<!-- Admin Modal -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <h2>Admin Login Required</h2>
+        <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off">
+        <div class="error" id="adminError"></div>
+        <button id="adminConfirmBtn">Confirm</button>
+        <button id="adminCancelBtn">Cancel</button>
     </div>
-  </div>
-  <!-- Admin password popup -->
-  <div class="admin-popup" id="adminPopup">
-    <div class="admin-panel">
-      <button class="close-btn" onclick="closeAdminPopup()" title="Close">&times;</button>
-      <div class="admin-title">Enter Admin Password</div>
-      <input type="password" id="adminPassInput" placeholder="Password" style="width:98%;margin-bottom:12px;">
-      <button onclick="submitAdminPassword()" class="csv-btn" style="width:100%;">Unlock Admin</button>
-      <div id="adminMsg" style="margin-top:10px;color:var(--danger);font-weight:600;"></div>
+</div>
+<!-- Export Options Modal -->
+<div class="modal" id="exportModal">
+    <div class="modal-content">
+        <h2>Export Options</h2>
+        <p>Select export type:</p>
+        <button id="exportLifeToDateBtn">Life to Date</button>
+        <button id="exportMonthToDateBtn">Month to Date</button>
+        <button id="exportCancelBtn">Cancel</button>
     </div>
-  </div>
-  <!-- Restore backup popup -->
-  <div class="restore-modal" id="restoreModal">
-    <div class="restore-panel">
-      <button class="close-btn" onclick="closeRestore()" title="Close">&times;</button>
-      <div class="restore-title">Restore Data from Backup</div>
-      <input type="file" id="restoreFile" accept="application/json" style="width:98%;margin-bottom:8px;">
-      <button onclick="doRestore()" class="csv-btn" style="width:100%;">Restore</button>
-      <div style="color:var(--danger);font-weight:600;margin-top:10px;">Warning: This will replace all data!</div>
-    </div>
-  </div>
-  <!-- Export Options Modal -->
-  <div class="export-modal" id="exportModal">
-    <div class="export-panel">
-      <button class="close-btn" onclick="closeExportModal()" title="Close">&times;</button>
-      <div class="export-title">Export Data</div>
-      <div class="export-options">
-        <div class="export-option">
-          <h3>All Data</h3>
-          <p>Export all water readings</p>
-          <div class="format-buttons">
-            <button class="format-btn csv-format" onclick="exportAllData('csv')">CSV</button>
-            <button class="format-btn pdf-format" onclick="exportAllData('pdf')">PDF</button>
+</div>
+<script>
+    // === JSONBin Config - CORRECTED SECRET KEY ===
+    const JSONBIN_ID = '686cdbfa8a456b7966bd5883';
+    const JSONBIN_SECRET = '$2a$10$BqM/s2f2kqZGoB5V14WtWOPOVO5/ccx/wZtBqmQsgeQqh6WMp42We'; // ✅ Correct key
+    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/686cdbfa8a456b7966bd5883`;
+    let outRecords = [];
+    let completedRecords = [];
+    let isLoaded = false;
+    let isAdmin = false;
+
+    function formatDateTime(dateTimeString) {
+        if (!dateTimeString) return '';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('en-ZA', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function renderStats() {
+        const statsPanel = document.getElementById('statsPanel');
+        statsPanel.style.display = isAdmin ? '' : 'none';
+        document.getElementById('showStatsBtn').style.display = isAdmin ? 'none' : '';
+        if (!isAdmin) {
+            statsPanel.innerHTML = '';
+            return;
+        }
+        const totalOut = outRecords.length;
+        const totalTrips = completedRecords.length;
+        const totalFuel = completedRecords.reduce((sum, r) => sum + parseFloat(r.fuelAmount || 0), 0);
+        const totalDistanceTraveled = completedRecords.reduce((sum, r) => sum + parseFloat(r.distanceTraveled || 0), 0);
+        const avgFuel = totalTrips ? (totalFuel / totalTrips) : 0;
+        const avgDistanceTraveled = totalTrips ? (totalDistanceTraveled / totalTrips) : 0;
+
+        let mostRecent = null;
+        if (completedRecords.length) {
+            mostRecent = completedRecords.reduce((a, b) => (a.dateTimeIn > b.dateTimeIn ? a : b));
+        }
+
+        let driverCounts = {};
+        completedRecords.forEach(r => {
+            driverCounts[r.driverName] = (driverCounts[r.driverName] || 0) + 1;
+        });
+        let mostActiveDriver = null, maxTrips = 0;
+        for (const [driver, count] of Object.entries(driverCounts)) {
+            if (count > maxTrips) {
+                maxTrips = count;
+                mostActiveDriver = driver;
+            }
+        }
+
+        let html = `
+          <div class="stat-card"><div class="stat-icon">🚗</div>
+            <div class="stat-value">${totalOut}</div>
+            <div class="stat-label">Checked Out</div>
           </div>
-        </div>
-        <div class="export-option">
-          <h3>Month to Date</h3>
-          <p>Export current month's readings</p>
-          <div class="format-buttons">
-            <button class="format-btn csv-format" onclick="exportMonthToDate('csv')">CSV</button>
-            <button class="format-btn pdf-format" onclick="exportMonthToDate('pdf')">PDF</button>
+          <div class="stat-card"><div class="stat-icon">✅</div>
+            <div class="stat-value">${totalTrips}</div>
+            <div class="stat-label">Completed Trips</div>
           </div>
-        </div>
-        <div class="export-option">
-          <h3>Life to Date</h3>
-          <p>Export all historical readings</p>
-          <div class="format-buttons">
-            <button class="format-btn csv-format" onclick="exportLifeToDate('csv')">CSV</button>
-            <button class="format-btn pdf-format" onclick="exportLifeToDate('pdf')">PDF</button>
+          <div class="stat-card"><div class="stat-icon">⛽</div>
+            <div class="stat-value">R${totalFuel.toFixed(2)}</div>
+            <div class="stat-label">Fuel Total</div>
           </div>
-        </div>
-        <div class="export-option">
-          <h3>Custom Range</h3>
-          <p>Export specific date range</p>
-          <div class="format-buttons">
-            <button class="format-btn csv-format" onclick="openCustomRangeModal('csv')">CSV</button>
-            <button class="format-btn pdf-format" onclick="openCustomRangeModal('pdf')">PDF</button>
+          <div class="stat-card"><div class="stat-icon">🛣️</div>
+            <div class="stat-value">${totalDistanceTraveled.toFixed(1)} km</div>
+            <div class="stat-label">Distance Total</div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Custom Date Range Modal -->
-  <div class="custom-modal" id="customModal">
-    <div class="custom-panel">
-      <button class="close-btn" onclick="closeCustomRangeModal()" title="Close">&times;</button>
-      <div class="custom-title">Custom Date Range Export</div>
-      <div class="date-range-container">
-        <div class="date-range-row">
-          <div>
-            <label for="startDate">Start Date</label>
-            <input type="date" id="startDate" required>
+          <div class="stat-card"><div class="stat-icon">💸</div>
+            <div class="stat-value">R${avgFuel.toFixed(2)}</div>
+            <div class="stat-label">Avg Fuel/Trip</div>
           </div>
-          <div>
-            <label for="endDate">End Date</label>
-            <input type="date" id="endDate" required>
+          <div class="stat-card"><div class="stat-icon">📊</div>
+            <div class="stat-value">${avgDistanceTraveled.toFixed(1)} km</div>
+            <div class="stat-label">Avg Distance/Trip</div>
           </div>
-        </div>
-        <div class="date-range-actions">
-          <button class="csv-btn" onclick="exportCustomRange()">Export</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>
-    // --- Floating Value Display ---
-    let floatingValueTimeout = null;
-    function showFloatingValue(inputElement) {
-        clearTimeout(floatingValueTimeout);
-        const floatingValue = document.getElementById('floatingValue');
-        const value = inputElement.value;
-        if (value !== '' && !isNaN(value) && value !== null) {
-            floatingValue.textContent = value;
-            floatingValue.style.display = 'block';
-            // Position it near the input
-            const rect = inputElement.getBoundingClientRect();
-            floatingValue.style.left = (rect.left + window.scrollX + rect.width / 2 - floatingValue.offsetWidth / 2) + 'px';
-            floatingValue.style.top = (rect.top + window.scrollY - 40) + 'px'; // 40px above
+        `;
+        if (mostRecent) {
+          html += `
+          <div class="stat-card"><div class="stat-icon">🕒</div>
+            <div class="stat-value">${mostRecent.driverName}</div>
+            <div class="stat-label">Last Trip<br><small>${mostRecent.cardRegistration}</small></div>
+          </div>
+          `;
+        }
+        if (mostActiveDriver) {
+          html += `
+          <div class="stat-card"><div class="stat-icon">🏆</div>
+            <div class="stat-value">${mostActiveDriver}</div>
+            <div class="stat-label">Most Active (${maxTrips})</div>
+          </div>
+          `;
+        }
+        statsPanel.innerHTML = html;
+    }
+
+    function updateCardDropdown() {
+        const dropdown = document.getElementById('cardRegistrationIn');
+        dropdown.innerHTML = '<option value="">Select Vehicle Registration</option>';
+        outRecords.forEach(record => {
+            const option = document.createElement('option');
+            option.value = record.cardRegistration;
+            option.textContent = `${record.cardRegistration} - ${record.driverName}`;
+            dropdown.appendChild(option);
+        });
+    }
+
+    function addOutRecordToTable(record) {
+        const tbody = document.getElementById('outRecordsBody');
+        const row = tbody.insertRow(0);
+        row.innerHTML = `
+            <td>${record.cardRegistration}</td>
+            <td>${record.driverName}</td>
+            <td>${formatDateTime(record.dateTimeOut)}</td>
+            <td><span class="status-badge status-out">Out</span></td>
+        `;
+    }
+
+    function addCompletedRecordToTable(record) {
+        const tbody = document.getElementById('inRecordsBody');
+        const row = tbody.insertRow(0);
+        row.innerHTML = `
+            <td>${record.cardRegistration}</td>
+            <td>${record.driverName}</td>
+            <td>${formatDateTime(record.dateTimeOut)}</td>
+            <td>${formatDateTime(record.dateTimeIn)}</td>
+            <td>${parseFloat(record.distanceTraveled).toFixed(1)} km</td>
+            <td>R${parseFloat(record.fuelAmount).toFixed(2)}</td>
+        `;
+    }
+
+    function refreshTables() {
+        const outRecordsBody = document.getElementById('outRecordsBody');
+        const inRecordsBody = document.getElementById('inRecordsBody');
+        outRecordsBody.innerHTML = '';
+        inRecordsBody.innerHTML = '';
+
+        if (outRecords.length === 0) {
+            outRecordsBody.innerHTML = '<tr><td colspan="4" class="empty-table-message">No vehicles currently checked out.</td></tr>';
         } else {
-            hideFloatingValue();
+            outRecords.forEach(addOutRecordToTable);
         }
-    }
-    function hideFloatingValue() {
-        clearTimeout(floatingValueTimeout);
-        // Delay hiding slightly to allow for transitions
-        floatingValueTimeout = setTimeout(() => {
-            document.getElementById('floatingValue').style.display = 'none';
-        }, 150);
-    }
-    // Add event listeners for focus and blur to show/hide floating values
-    document.addEventListener('DOMContentLoaded', () => {
-        const numberInputs = document.querySelectorAll('.row input[type="number"]');
-        numberInputs.forEach(input => {
-            // Show on focus
-            input.addEventListener('focus', (e) => {
-                showFloatingValue(e.target);
-            });
-            // Update position/value on input
-            input.addEventListener('input', (e) => {
-                 if (document.getElementById('floatingValue').style.display === 'block') {
-                     showFloatingValue(e.target); // Re-show to update value/position
-                 }
-            });
-            // Hide on blur
-            input.addEventListener('blur', () => {
-                 hideFloatingValue();
-            });
-            // Also trigger calculation on input change
-            const originalOnInput = input.oninput;
-            input.oninput = function(e) {
-                if (originalOnInput) originalOnInput.call(this, e);
-                // If floating value is visible, update it
-                if (document.getElementById('floatingValue').style.display === 'block') {
-                    showFloatingValue(this);
-                }
-            };
-        });
-    });
-    // Tooltips for table headers
-    const tooltips = {
-      "Date": "The date of the reading.\nSelect or type to add/edit past/future readings.",
-      "Bowser": "Manual water bowser readings.\nShows opening, closing, and usage.",
-      "Dipstick": "Fuel dipstick tank readings.\nOpening, closing, and daily usage.",
-      "iLembe": "iLembe Water meter readings.",
-      "Hydrant": "Fire hydrant readings (if used for water).",
-      "Counted By": "Who counted/measured these readings.",
-      "Notes": "Optional remarks about the day.",
-      "Action": "Edit or delete (admin only)."
-    };
-    window.addEventListener('DOMContentLoaded', ()=>{
-      setTimeout(()=>{
-        document.querySelectorAll('.history-table th').forEach(th=>{
-          const text = th.textContent.trim();
-          if (tooltips[text]) {
-            let tooltip = document.createElement('div');
-            tooltip.className = "tooltip";
-            tooltip.innerHTML = tooltips[text].replace(/\n/g,"<br>");
-            th.appendChild(tooltip);
-          }
-        });
-      }, 400);
-    });
-    // JSONBin Setup
-    const binId = "686b9c1b8561e97a5032ef3e";
-    const apiKey = "$2a$10$rMDjhTzn1yDfnMMAec0fW.Ok54iIQijr5K2OixHy8gaxSF.UMSw.S";
-    const url = `https://api.jsonbin.io/v3/b/${binId}`;
-    const ADMIN_PASS = "Superb@123";
-    const COMPANY_NAME = "Superb Hyper";
-    let readingsHistory = [];
-    let editingIdx = null;
-    let editingDate = null;
-    let adminMode = false;
-    let loading = true;
-    let chartInstance = null;
-    let chartType = 'line';
-    let lastMsgTimeout = null;
-    let darkMode = false;
-    let selectedExportFormat = null;
-    function calcDiff(section) {
-      const open = Number(document.getElementById(section + 'Open').value) || 0;
-      const close = Number(document.getElementById(section + 'Close').value) || 0;
-      let diff;
-      if (section === "dip") {
-        diff = open - close; // Dipstick: opening minus closing
-      } else {
-        diff = close - open; // Others: closing minus opening
-      }
-      document.getElementById(section + 'Diff').textContent = (open || close) ? diff : '-';
-    }
-    function getTodayString() {
-      const d = new Date();
-      return d.toISOString().slice(0,10);
-    }
-    function getMonthStartString() {
-      const d = new Date();
-      return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10);
-    }
-    function initials(name) {
-      if (!name) return "";
-      return name.split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    }
-    function randomColor(str) {
-      let hash = 0; for (let i=0;i<str.length;i++) hash = str.charCodeAt(i) + ((hash<<5)-hash);
-      let h = hash%360; return `hsl(${h}, 60%, 80%)`;
-    }
-    function showMsg(text, ok=true) {
-      clearTimeout(lastMsgTimeout);
-      let msg = document.getElementById('msg');
-      msg.innerHTML = `<div class="${ok?'success-msg':'error-msg'}">${text}</div>`;
-      lastMsgTimeout = setTimeout(()=>{ msg.innerHTML=''; }, 3200);
-    }
-    function showSavingSpinner(show) {
-      document.getElementById('saveBtn').innerHTML = show
-        ? `<span class="saving-spinner"></span>Saving...`
-        : (editingIdx!==null?"Update":"Save Reading");
-    }
-    function setDarkMode(on) {
-      document.body.classList.toggle("dark", !!on);
-      darkMode = !!on;
-      document.querySelector('.dark-btn').textContent = darkMode ? "☀️" : "🌙";
-      localStorage.setItem("darkMode", darkMode ? "1" : "");
-    }
-    function toggleDarkMode() { setDarkMode(!darkMode); }
-    function showAdminPopup() {
-      document.getElementById('adminPopup').classList.add("active");
-      document.getElementById('adminPassInput').focus();
-    }
-    function closeAdminPopup() {
-      document.getElementById('adminPopup').classList.remove("active");
-      document.getElementById('adminMsg').textContent = "";
-      document.getElementById('adminPassInput').value = "";
-    }
-    function submitAdminPassword() {
-      let val = document.getElementById('adminPassInput').value.trim();
-      if (val === ADMIN_PASS) {
-        adminMode = true;
-        showMsg("Admin unlocked!",true);
-        closeAdminPopup();
-        renderHistory();
-      } else {
-        document.getElementById('adminMsg').textContent = "Incorrect password!";
-      }
-    }
-    async function loadHistory() {
-      loading = true;
-      document.getElementById('loader').style.display = '';
-      document.getElementById('saveBtn').disabled = true;
-      try {
-        const res = await fetch(url + '/latest', {
-          headers: { "X-Access-Key": apiKey }
-        });
-        if (!res.ok) throw new Error('Could not load data from cloud.');
-        const data = await res.json();
-        readingsHistory = data.record.dailyReadings || [];
-        renderHistory();
-        fillOpeningsFromLast();
-      } catch (e) {
-        showMsg("Could not load from cloud: " + e.message, false);
-        readingsHistory = [];
-        renderHistory();
-        fillOpeningsFromLast();
-      } finally {
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('saveBtn').disabled = false;
-        loading = false;
-      }
-    }
-    async function saveHistory() {
-      showSavingSpinner(true);
-      document.getElementById('saveBtn').disabled = true;
-      try {
-        const res = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            "Content-Type": "application/json",
-            "X-Access-Key": apiKey
-          },
-          body: JSON.stringify({ dailyReadings: readingsHistory })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error((data && data.message) ? data.message : 'Failed to save to cloud.');
-        showMsg("Saved!",true);
-        fillOpeningsFromLast();
-      } catch (e) {
-        showMsg("Cloud save failed: " + (e && e.message ? e.message : e),false);
-      } finally {
-        showSavingSpinner(false);
-        document.getElementById('saveBtn').disabled = false;
-      }
-    }
-    function fillOpeningsFromLast() {
-      if (!readingsHistory.length) return;
-      const latest = [...readingsHistory].sort((a,b)=>b.date.localeCompare(a.date))[0];
-      if (editingIdx === null) {
-        document.getElementById('bowserOpen').value = latest.bowserClose ?? '';
-        document.getElementById('dipOpen').value = latest.dipClose ?? '';
-        document.getElementById('ilembeOpen').value = latest.ilembeClose ?? '';
-        document.getElementById('hydrantOpen').value = latest.hydrantClose ?? '';
-        ['bowser','dip','ilembe','hydrant'].forEach(s=>{
-          document.getElementById(s+'Close').value = '';
-          document.getElementById(s+'Diff').textContent = '-';
-        });
-      }
-    }
-    function cancelEdit() {
-      editingIdx = null; editingDate = null;
-      document.getElementById('cancelEditBtn').style.display = 'none';
-      document.getElementById('saveBtn').textContent = "Save Reading";
-      document.getElementById('readingDate').disabled = false;
-      readingsForm.reset();
-      ['bowser','dip','ilembe','hydrant'].forEach(s => document.getElementById(s+'Diff').textContent='-');
-      fillOpeningsFromLast();
-    }
-    document.getElementById('readingsForm').onsubmit = async function(e) {
-      e.preventDefault();
-      if (loading) return false;
-      const date = document.getElementById('readingDate').value;
-      const counted = countedBy.value.trim();
-      const notesVal = notes.value.trim();
-      const openCloseDiffs = [
-        {s:"bowser",open:+bowserOpen.value,close:+bowserClose.value},
-        {s:"dip",open:+dipOpen.value,close:+dipClose.value},
-        {s:"ilembe",open:+ilembeOpen.value,close:+ilembeClose.value},
-        {s:"hydrant",open:+hydrantOpen.value,close:+hydrantClose.value},
-      ];
-      for(let i=0;i<openCloseDiffs.length;i++) {
-        if (openCloseDiffs[i].s === "dip") {
-          if (openCloseDiffs[i].open < openCloseDiffs[i].close) {
-            showMsg("Error: Dipstick opening cannot be less than closing!", false); return;
-          }
+
+        if (completedRecords.length === 0) {
+            inRecordsBody.innerHTML = '<tr><td colspan="6" class="empty-table-message">No completed trips yet.</td></tr>';
         } else {
-          if (openCloseDiffs[i].close < openCloseDiffs[i].open) {
-            showMsg(`Error: ${openCloseDiffs[i].s.charAt(0).toUpperCase()+openCloseDiffs[i].s.slice(1)} closing < opening!`,false); return;
-          }
+            completedRecords.forEach(addCompletedRecordToTable);
         }
-      }
-      if (!counted) { showMsg("Counted By is required.",false); return; }
-      if (!date) { showMsg("Please select a date.",false); return; }
-      let existingIdx = readingsHistory.findIndex(h => h.date === date);
-      if (editingIdx === null && existingIdx !== -1) {
-        showMsg("A reading for this date already exists. Use Edit.",false); return;
-      }
-      const data = {
-        date,
-        bowserOpen:+bowserOpen.value, bowserClose:+bowserClose.value, bowserDiff:+bowserClose.value-+bowserOpen.value,
-        dipOpen:+dipOpen.value, dipClose:+dipClose.value, dipDiff:+dipOpen.value-+dipClose.value,
-        ilembeOpen:+ilembeOpen.value, ilembeClose:+ilembeClose.value, ilembeDiff:+ilembeClose.value-+ilembeOpen.value,
-        hydrantOpen:+hydrantOpen.value, hydrantClose:+hydrantClose.value, hydrantDiff:+hydrantClose.value-+hydrantOpen.value,
-        countedBy:counted,
-        notes:notesVal
-      };
-      // Removed checkedBy from data object
-      if (editingIdx !== null) {
-        readingsHistory[editingIdx] = data;
-        editingIdx = null; editingDate = null;
-        document.getElementById('cancelEditBtn').style.display = 'none';
-        document.getElementById('readingDate').disabled = false;
-        document.getElementById('saveBtn').textContent = "Update";
-      } else {
-        readingsHistory.push(data);
-      }
-      renderHistory();
-      await saveHistory();
-      readingsForm.reset();
-      ['bowser','dip','ilembe','hydrant'].forEach(s => document.getElementById(s+'Diff').textContent='-');
-      fillOpeningsFromLast();
-    };
-    function renderHistory() {
-      if (readingsHistory.length === 0) {
-        document.getElementById('historySection').innerHTML = '<p style="text-align:center;margin-top:15px;">No previous readings saved.</p>';
-        return;
-      }
-      const sorted = [...readingsHistory].sort((a,b)=>b.date.localeCompare(a.date));
-      let table = `<table class="history-table" aria-label="Reading History Table">
-        <tr>`;
-      // Removed "Checked By" from table headers
-      ["Date","Bowser","Dipstick","iLembe","Hydrant","Counted By","Notes","Action"].forEach(h=>{
-        table += `<th>${h}${tooltips[h]?'<div class="tooltip">'+tooltips[h].replace(/\n/g,"<br>")+'</div>':''}</th>`;
-      });
-      table += "</tr>";
-      for (let i=0; i<sorted.length; i++) {
-        const entry = sorted[i];
-        const prev = sorted[i+1];
-        function arrow(curr,prev) {
-          if (!prev) return "";
-          if (curr>prev) return '<span title="Increased" style="color:var(--success);font-size:1.05em">&#8593;</span>';
-          if (curr<prev) return '<span title="Decreased" style="color:var(--danger);font-size:1.05em">&#8595;</span>';
-          return '<span title="No Change" style="color:#aaa">&#8596;</span>';
-        }
-        function avatar(name) {
-          if (!name) return "";
-          return `<span class="avatar" style="background:${randomColor(name)}" aria-label="Initials">${initials(name)}</span>`;
-        }
-        table += `<tr>
-          <td>${entry.date}</td>
-          <td>${entry.bowserOpen}&rarr;${entry.bowserClose} <b>(${entry.bowserDiff})</b> ${arrow(entry.bowserDiff,prev?prev.bowserDiff:undefined)}</td>
-          <td>${entry.dipOpen}&rarr;${entry.dipClose} <b>(${entry.dipDiff})</b> ${arrow(entry.dipDiff,prev?prev.dipDiff:undefined)}</td>
-          <td>${entry.ilembeOpen}&rarr;${entry.ilembeClose} <b>(${entry.ilembeDiff})</b> ${arrow(entry.ilembeDiff,prev?prev.ilembeDiff:undefined)}</td>
-          <td>${entry.hydrantOpen}&rarr;${entry.hydrantClose} <b>(${entry.hydrantDiff})</b> ${arrow(entry.hydrantDiff,prev?prev.hydrantDiff:undefined)}</td>
-          <td>${avatar(entry.countedBy)}${entry.countedBy||""}</td>
-          <td style="max-width:110px;overflow-x:auto;">${entry.notes||''}</td>
-          <td>`;
-        if (adminMode) {
-          table += `<button class="action-btn" title="Edit" onclick="editEntryByDate('${entry.date}')">&#9998;</button>
-            <button class="action-btn" title="Delete" onclick="deleteEntryByDate('${entry.date}')">&#10006;</button>`;
-        } else {
-          table += `<button class="action-btn" title="Edit (admin only)" onclick="showAdminPopup()">&#9998;</button>
-            <button class="action-btn" title="Delete (admin only)" onclick="showAdminPopup()">&#10006;</button>`;
-        }
-        table += `</td></tr>`;
-      }
-      table += '</table>';
-      document.getElementById('historySection').innerHTML = table;
+
+        updateCardDropdown();
+        renderStats();
     }
-    window.editEntryByDate = function(date) {
-      if (!adminMode) { showAdminPopup(); return; }
-      let idx = readingsHistory.findIndex(e=>e.date===date);
-      if (idx === -1) return;
-      const entry = readingsHistory[idx];
-      document.getElementById('readingDate').value = entry.date;
-      document.getElementById('readingDate').disabled = true;
-      document.getElementById('bowserOpen').value = entry.bowserOpen;
-      document.getElementById('bowserClose').value = entry.bowserClose;
-      document.getElementById('dipOpen').value = entry.dipOpen;
-      document.getElementById('dipClose').value = entry.dipClose;
-      document.getElementById('ilembeOpen').value = entry.ilembeOpen;
-      document.getElementById('ilembeClose').value = entry.ilembeClose;
-      document.getElementById('hydrantOpen').value = entry.hydrantOpen;
-      document.getElementById('hydrantClose').value = entry.hydrantClose;
-      document.getElementById('countedBy').value = entry.countedBy || '';
-      // Removed setting checkedBy value
-      document.getElementById('notes').value = entry.notes || '';
-      calcDiff('bowser'); calcDiff('dip'); calcDiff('ilembe'); calcDiff('hydrant');
-      editingIdx = idx;
-      editingDate = entry.date;
-      document.getElementById('cancelEditBtn').style.display = '';
-      document.getElementById('saveBtn').textContent = "Update";
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    };
-    window.deleteEntryByDate = async function(date) {
-      if (!adminMode) { showAdminPopup(); return; }
-      let idx = readingsHistory.findIndex(e=>e.date===date);
-      if (idx === -1) return;
-      if (!confirm("Delete this day's readings?")) return;
-      readingsHistory.splice(idx, 1);
-      renderHistory();
-      await saveHistory();
-    };
-    function generateCSV(data) {
-      let csv = [
-        [
-          "Date",
-          "Bowser Opening","Bowser Closing","Bowser Difference",
-          "Dipstick Opening","Dipstick Closing","Dipstick Difference",
-          "iLembe Opening","iLembe Closing","iLembe Difference",
-          "Hydrant Opening","Hydrant Closing","Hydrant Difference",
-          "Counted By",
-          "Notes"
-        ].join(",")
-      ];
-      data.forEach(e=>{
-        csv.push([
-          e.date,
-          e.bowserOpen, e.bowserClose, e.bowserDiff,
-          e.dipOpen, e.dipClose, e.dipDiff,
-          e.ilembeOpen, e.ilembeClose, e.ilembeDiff,
-          e.hydrantOpen, e.hydrantClose, e.hydrantDiff,
-          '"' + (e.countedBy||"").replace(/"/g, '""') + '"',
-          '"' + (e.notes||"").replace(/"/g, '""') + '"'
-        ].join(","));
-      });
-      return csv.join("\r\n");
-    }
-    function generatePDF(data, title) {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text(COMPANY_NAME + " – " + title, 13, 18);
-      doc.setFontSize(12);
-      let rows = [["Date","Bowser Diff","Dipstick Diff","iLembe Diff","Hydrant Diff","Counted By","Notes"]];
-      data.slice(-25).reverse().forEach(e=>{
-        rows.push([e.date,e.bowserDiff,e.dipDiff,e.ilembeDiff,e.hydrantDiff,e.countedBy,e.notes||""]);
-      });
-      if (typeof doc.autoTable === "function") {
-        doc.autoTable({ head: [rows[0]], body: rows.slice(1), startY: 25, styles:{font:"helvetica",fontSize:10,cellPadding:2}});
-      } else {
-        let y = 30;
-        rows.forEach(r=>{
-          doc.text(r.join(' | '),10,y);
-          y += 7;
-        });
-      }
-      return doc;
-    }
-    // Export Modal Functions
-    window.openExportModal = function() {
-      document.getElementById('exportModal').classList.add("active");
-    };
-    window.closeExportModal = function() {
-      document.getElementById('exportModal').classList.remove("active");
-    };
-    window.exportAllData = function(format) {
-      if (readingsHistory.length === 0) { 
-        alert("No data to export."); 
-        return; 
-      }
-      
-      closeExportModal();
-      
-      if (format === 'csv') {
-        const csv = generateCSV(readingsHistory);
-        const blob = new Blob([csv], {type: 'text/csv'});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "all_water_readings.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        const doc = generatePDF(readingsHistory, "All Water Readings");
-        doc.save("all_water_readings.pdf");
-      }
-    };
-    window.exportMonthToDate = function(format) {
-      if (readingsHistory.length === 0) { 
-        alert("No data to export."); 
-        return; 
-      }
-      
-      const today = new Date();
-      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-      const filteredData = readingsHistory.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return entryDate >= monthStart && entryDate <= today;
-      });
-      
-      if (filteredData.length === 0) {
-        alert("No data found for the current month.");
-        return;
-      }
-      
-      closeExportModal();
-      
-      if (format === 'csv') {
-        const csv = generateCSV(filteredData);
-        const blob = new Blob([csv], {type: 'text/csv'});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "month_to_date_water_readings.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        const doc = generatePDF(filteredData, "Month to Date Water Readings");
-        doc.save("month_to_date_water_readings.pdf");
-      }
-    };
-    window.exportLifeToDate = function(format) {
-      if (readingsHistory.length === 0) { 
-        alert("No data to export."); 
-        return; 
-      }
-      
-      closeExportModal();
-      
-      if (format === 'csv') {
-        const csv = generateCSV(readingsHistory);
-        const blob = new Blob([csv], {type: 'text/csv'});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "life_to_date_water_readings.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        const doc = generatePDF(readingsHistory, "Life to Date Water Readings");
-        doc.save("life_to_date_water_readings.pdf");
-      }
-    };
-    window.openCustomRangeModal = function(format) {
-      selectedExportFormat = format;
-      document.getElementById('exportModal').classList.remove("active");
-      document.getElementById('customModal').classList.add("active");
-      // Set default dates
-      const today = new Date();
-      const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-      
-      document.getElementById('startDate').value = lastMonth.toISOString().slice(0,10);
-      document.getElementById('endDate').value = today.toISOString().slice(0,10);
-    };
-    window.closeCustomRangeModal = function() {
-      document.getElementById('customModal').classList.remove("active");
-      selectedExportFormat = null;
-    };
-    window.exportCustomRange = function() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      
-      if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
-        return;
-      }
-      
-      const filteredData = readingsHistory.filter(entry => {
-        return entry.date >= startDate && entry.date <= endDate;
-      });
-      
-      if (filteredData.length === 0) {
-        alert("No data found for the selected date range.");
-        return;
-      }
-      
-      closeCustomRangeModal();
-      
-      if (selectedExportFormat === 'csv') {
-        const csv = generateCSV(filteredData);
-        const blob = new Blob([csv], {type: 'text/csv'});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `custom_range_water_readings_${startDate}_to_${endDate}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        const doc = generatePDF(filteredData, `Water Readings (${startDate} to ${endDate})`);
-        doc.save(`custom_range_water_readings_${startDate}_to_${endDate}.pdf`);
-      }
-    };
-    window.backupJSON = function() {
-      if (readingsHistory.length === 0) return alert("No data to backup.");
-      const blob = new Blob([JSON.stringify({dailyReadings: readingsHistory},null,2)], {type: 'application/json'});
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "superb_water_backup.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    };
-    function openRestore() {
-      if (!adminMode) { showAdminPopup(); return; }
-      document.getElementById('restoreModal').classList.add("active");
-    }
-    function closeRestore() {
-      document.getElementById('restoreModal').classList.remove("active");
-      document.getElementById('restoreFile').value = "";
-    }
-    function doRestore() {
-      const file = document.getElementById('restoreFile').files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async function(e) {
+
+    async function loadFromBin() {
         try {
-          const obj = JSON.parse(e.target.result);
-          if (!obj.dailyReadings) throw "File missing dailyReadings array.";
-          if (!confirm("Are you sure? This will replace ALL current data.")) return;
-          readingsHistory = obj.dailyReadings;
-          renderHistory();
-          await saveHistory();
-          closeRestore();
-          showMsg("Restore complete!", true);
-        } catch(err) {
-          alert("Invalid file: "+err);
+            const res = await fetch(JSONBIN_URL + '/latest', {
+                headers: { 'X-Master-Key': JSONBIN_SECRET }
+            });
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(`HTTP ${res.status}: ${error.message || 'Unknown error'}`);
+            }
+            const data = await res.json();
+            outRecords = data.record.outRecords || [];
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+            completedRecords = (data.record.completedRecords || []).filter(record => {
+                const dateIn = new Date(record.dateTimeIn);
+                const recordMonth = dateIn.getMonth();
+                const recordYear = dateIn.getFullYear();
+                return !(recordMonth === lastMonth && recordYear === lastMonthYear);
+            });
+
+            refreshTables();
+
+            const totalOriginal = (data.record.completedRecords || []).length;
+            const removed = totalOriginal - completedRecords.length;
+            if (removed > 0) {
+                alert(`Loaded data. Removed ${removed} record(s) from last month.`);
+            }
+        } catch (err) {
+            console.error('Load error:', err);
+            alert('Failed to load or clean data: ' + (err.message || err));
+            outRecords = [];
+            completedRecords = [];
+            refreshTables();
         }
-      };
-      reader.readAsText(file);
+        isLoaded = true;
     }
-    window.showStats = function() {
-      if (readingsHistory.length === 0) {
-        document.getElementById('statsContent').innerHTML = `<div style="margin:13px;">No stats available yet.</div>`;
-      } else {
-        const {daily, weekly, monthly} = groupStats(readingsHistory);
-        let html = "";
-        html += statsTable("Most Recent 5 Days", daily, 5);
-        html += statsTable("Most Recent 5 Weeks", weekly, 5);
-        html += statsTable("Most Recent 5 Months", monthly, 5);
-        document.getElementById('statsContent').innerHTML = html;
-      }
-      document.getElementById('statModal').classList.add("active");
-    };
-    window.closeStats = function() {
-      document.getElementById('statModal').classList.remove("active");
-    };
-    window.showChart = function() {
-      document.getElementById('chartModal').classList.add('active');
-      setTimeout(updateChart, 50);
-    };
-    window.closeChart = function() {
-      document.getElementById('chartModal').classList.remove('active');
-      if (chartInstance) chartInstance.destroy();
-    };
-    window.setChartType = function(type) {
-      chartType = type;
-      document.getElementById('btnLine').classList.toggle('selected', type === 'line');
-      document.getElementById('btnBar').classList.toggle('selected', type === 'bar');
-      document.getElementById('btnStacked').classList.toggle('selected', type === 'stacked');
-      document.getElementById('btnPie').classList.toggle('selected', type === 'pie');
-      updateChart();
-    };
-    window.updateChart = function() {
-      if (!readingsHistory.length) return;
-      const sorted = [...readingsHistory].sort((a,b)=>a.date.localeCompare(b.date));
-      const labels = sorted.map(e=>e.date);
-      const bowser = sorted.map(e=>e.bowserDiff);
-      const dip = sorted.map(e=>e.dipDiff);
-      const ilembe = sorted.map(e=>e.ilembeDiff);
-      const hydrant = sorted.map(e=>e.hydrantDiff);
-      const total = sorted.map((e,i)=>bowser[i]+dip[i]+ilembe[i]+hydrant[i]);
-      const showBowser = document.getElementById('showBowser').checked;
-      const showDip = document.getElementById('showDip').checked;
-      const showIlembe = document.getElementById('showIlembe').checked;
-      const showHydrant = document.getElementById('showHydrant').checked;
-      const showTotal = document.getElementById('showTotal').checked;
-      if (chartInstance) chartInstance.destroy();
-      const ctx = document.getElementById('chartCanvas').getContext('2d');
-      let datasets = [];
-      if (chartType==="pie") {
-        let lastIdx = labels.length-1;
-        let dataPie = [];
-        if (showBowser) dataPie.push(bowser[lastIdx]);
-        if (showDip) dataPie.push(dip[lastIdx]);
-        if (showIlembe) dataPie.push(ilembe[lastIdx]);
-        if (showHydrant) dataPie.push(hydrant[lastIdx]);
-        let bg = [];
-        if (showBowser) bg.push(getComputedStyle(document.documentElement).getPropertyValue('--bowser'));
-        if (showDip) bg.push(getComputedStyle(document.documentElement).getPropertyValue('--dip'));
-        if (showIlembe) bg.push(getComputedStyle(document.documentElement).getPropertyValue('--ilembe'));
-        if (showHydrant) bg.push(getComputedStyle(document.documentElement).getPropertyValue('--hydrant'));
-        datasets = [{
-          label: "Latest Day's Usage",
-          data: dataPie,
-          backgroundColor: bg
-        }];
-        chartInstance = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: ["Bowser","Dipstick","iLembe","Hydrant"].filter((v,i)=>[showBowser,showDip,showIlembe,showHydrant][i]),
-            datasets
-          },
-          options: { plugins:{ legend:{position:'top'} }, responsive:true }
+
+    async function saveToBin() {
+        if (!isLoaded) return;
+        const data = { outRecords, completedRecords };
+        try {
+            const res = await fetch(JSONBIN_URL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_SECRET
+                },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(error.message || `HTTP ${res.status}`);
+            }
+            console.log("Saved successfully!");
+        } catch (err) {
+            console.error('Save error:', err);
+            alert('Failed to save data.\n' + err.message);
+        }
+    }
+
+    async function clearData() {
+        outRecords = [];
+        completedRecords = [];
+        refreshTables();
+        await saveToBin();
+    }
+
+    function calculateExportTotals(records) {
+        let totalMileage = 0;
+        let totalFuel = 0;
+        let totalDistance = 0;
+        records.forEach(record => {
+            totalMileage += parseFloat(record.mileageIn || 0);
+            totalFuel += parseFloat(record.fuelAmount || 0);
+            totalDistance += parseFloat(record.distanceTraveled || 0);
         });
-        return;
-      }
-      if (showBowser) datasets.push({
-        label: 'Bowser', data: bowser,
-        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bowser'),
-        backgroundColor: 'rgba(40,112,234,0.14)',
-        pointRadius: 3, fill: chartType==='line'||chartType==='stacked'
-      });
-      if (showDip) datasets.push({
-        label: 'Dipstick', data: dip,
-        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--dip'),
-        backgroundColor: 'rgba(255,165,2,0.16)',
-        pointRadius: 3, fill: chartType==='line'||chartType==='stacked'
-      });
-      if (showIlembe) datasets.push({
-        label: 'iLembe', data: ilembe,
-        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--ilembe'),
-        backgroundColor: 'rgba(35,193,129,0.18)',
-        pointRadius: 3, fill: chartType==='line'||chartType==='stacked'
-      });
-      if (showHydrant) datasets.push({
-        label: 'Hydrant', data: hydrant,
-        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--hydrant'),
-        backgroundColor: 'rgba(230,39,57,0.19)',
-        pointRadius: 3, fill: chartType==='line'||chartType==='stacked'
-      });
-      if (showTotal) datasets.push({
-        label: 'Total', data: total,
-        borderColor: '#111', backgroundColor: '#aaa', borderDash: [6,4], borderWidth: 2, pointRadius: 3
-      });
-      let opts = {
-        responsive: true,
-        plugins: {
-          legend: { display:true, position:'top', labels:{font:{weight:'bold'}} },
-          title: { display: false }
-        },
-        elements: {
-          line: { tension: 0.32, fill: chartType==='stacked' }
-        },
-        scales: {
-          x: { ticks: { font: { size: 13 }, color: '#888' } },
-          y: { title: { display: true, text: 'Difference', color: '#333', font:{size:13, weight:'bold'}},
-                ticks: { font: { size: 13 }, color: '#888' }, grid: { color:'#eaf2fa' }
-          }
+        return {
+            totalMileage: totalMileage.toFixed(1),
+            totalFuel: totalFuel.toFixed(2),
+            totalDistance: totalDistance.toFixed(1)
+        };
+    }
+
+    function exportLifeToDateCSV() {
+        let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
+        completedRecords.forEach(record => {
+            const dateOut = new Date(record.dateTimeOut);
+            const monthOut = dateOut.toLocaleString('default', { month: 'long' });
+            csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
+        });
+        const totals = calculateExportTotals(completedRecords);
+        csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
+        downloadCSV(csv, "fleet_life_to_date.csv");
+    }
+
+    function exportMonthToDateCSV() {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+        const monthRecords = completedRecords.filter(record => {
+            const recordDate = new Date(record.dateTimeIn);
+            return recordDate.getMonth() === currentMonth && 
+                   recordDate.getFullYear() === currentYear;
+        });
+        let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
+        monthRecords.forEach(record => {
+            const dateOut = new Date(record.dateTimeOut);
+            const monthOut = dateOut.toLocaleString('default', { month: 'long' });
+            csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
+        });
+        const totals = calculateExportTotals(monthRecords);
+        csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
+        const filename = `fleet_${currentDate.toLocaleString('default', { month: 'long' })}_${currentYear}.csv`;
+        downloadCSV(csv, filename);
+    }
+
+    function downloadCSV(csvContent, filename) {
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function showExportModal() {
+        exportModal.style.display = 'flex';
+    }
+
+    function hideExportModal() {
+        exportModal.style.display = 'none';
+    }
+
+    document.getElementById('vehicleOutForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const cardRegistration = formData.get('cardRegistrationOut').trim();
+        if (outRecords.some(record => record.cardRegistration === cardRegistration)) {
+            alert('This vehicle is already checked out!');
+            return;
         }
-      };
-      if (chartType==='stacked') {
-        opts.scales.x.stacked = true; opts.scales.y.stacked = true;
-      }
-      chartInstance = new Chart(ctx, {
-        type: (chartType==='line'||chartType==='stacked')?'line':'bar',
-        data: { labels, datasets },
-        options: opts
-      });
-    };
-    function groupStats(data) {
-      const daily = {}, weekly = {}, monthly = {};
-      data.forEach(e => {
-        if (!e.date) return;
-        daily[e.date] = daily[e.date]||[]; daily[e.date].push(e);
-        const weekKey = e.date.slice(0,4)+'-W'+getWeekNum(e.date);
-        weekly[weekKey] = weekly[weekKey]||[]; weekly[weekKey].push(e);
-        const monKey = getMonthStr(e.date);
-        monthly[monKey] = monthly[monKey]||[]; monthly[monKey].push(e);
-      });
-      return {daily, weekly, monthly};
-    }
-    function statsTable(label, groups, count=5) {
-      let keys = Object.keys(groups).sort().reverse();
-      if (count) keys = keys.slice(0, count);
-      let html = `<div class="stat-section"><div class="stat-label">${label}</div>`;
-      keys.forEach(k=>{
-        html += `<div style="font-weight:700; margin-top:7px;">${k}</div>
-          <table class="stat-table">${statRows(groups[k])}</table>`;
-      });
-      html += "</div>";
-      return html;
-    }
-    function statRows(entries) {
-      function sum(field) { return entries.reduce((a,b)=>a+(Number(b[field])||0),0); }
-      function avg(field) { return entries.length ? sum(field)/entries.length : 0; }
-      return `
-        <tr><th></th>
-            <th>Bowser</th>
-            <th>Dipstick</th>
-            <th>iLembe</th>
-            <th>Hydrant</th>
-        </tr>
-        <tr>
-          <td>Total</td>
-          <td>${sum("bowserDiff")}</td>
-          <td>${sum("dipDiff")}</td>
-          <td>${sum("ilembeDiff")}</td>
-          <td>${sum("hydrantDiff")}</td>
-        </tr>
-        <tr>
-          <td>Average</td>
-          <td>${avg("bowserDiff").toFixed(2)}</td>
-          <td>${avg("dipDiff").toFixed(2)}</td>
-          <td>${avg("ilembeDiff").toFixed(2)}</td>
-          <td>${avg("hydrantDiff").toFixed(2)}</td>
-        </tr>
-      `;
-    }
-    function getWeekNum(dateStr) {
-      const d = new Date(dateStr);
-      d.setHours(0,0,0,0);
-      d.setDate(d.getDate() + 4 - (d.getDay()||7));
-      const yearStart = new Date(d.getFullYear(),0,1);
-      return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-    }
-    function getMonthStr(dateStr) { return dateStr.slice(0,7); }
-    // Startup
-    document.addEventListener("DOMContentLoaded", ()=>{
-      document.getElementById('readingDate').value = getTodayString();
-      setDarkMode(localStorage.getItem("darkMode")==="1");
-      loadHistory();
-      document.getElementById('adminPassInput').addEventListener('keydown', function(e) {
-        if (e.key==="Enter") submitAdminPassword();
-      });
+        const record = {
+            cardRegistration: cardRegistration,
+            driverName: formData.get('driverNameOut'),
+            dateTimeOut: formData.get('dateTimeOut'),
+            timestamp: new Date().toISOString()
+        };
+        outRecords.push(record);
+        refreshTables();
+        this.reset();
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('dateTimeOut').value = now.toISOString().slice(0, 16);
+        alert('Vehicle checked out successfully!');
+        await saveToBin();
     });
-  </script>
+
+    document.getElementById('fuelAmount').addEventListener('input', function() {
+        const fuelAmount = parseFloat(this.value) || 0;
+        const errorDiv = document.getElementById('fuelAmountError');
+        if (fuelAmount > 2500) {
+            errorDiv.style.display = 'block';
+            this.style.borderColor = '#c53030';
+        } else {
+            errorDiv.style.display = 'none';
+            this.style.borderColor = '#e1e8ed';
+        }
+    });
+
+    // Enhanced vehicle in form with mileage confirmation
+    document.getElementById('vehicleInForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const cardRegistration = formData.get('cardRegistrationIn');
+        const fuelAmount = parseFloat(formData.get('fuelAmount')) || 0;
+
+        if (fuelAmount > 2500) {
+            alert('Fuel amount cannot exceed R2500!');
+            return;
+        }
+
+        const outRecord = outRecords.find(record => record.cardRegistration === cardRegistration);
+        if (!outRecord) {
+            alert('No checkout record found for this vehicle!');
+            return;
+        }
+
+        const dateTimeIn = formData.get('dateTimeIn');
+        if (new Date(dateTimeIn) <= new Date(outRecord.dateTimeOut)) {
+            alert('Date/Time In must be after Date/Time Out!');
+            return;
+        }
+
+        const mileageInInput = formData.get('mileageIn');
+        if (!mileageInInput || isNaN(parseFloat(mileageInInput))) {
+            alert('Please enter a valid Mileage In value.');
+            return;
+        }
+
+        const currentMileageIn = parseFloat(mileageInInput);
+
+        // Get last recorded mileage
+        const lastCompletedTripForCard = completedRecords
+            .filter(record => record.cardRegistration === cardRegistration)
+            .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
+            .at(0);
+        const lastMileageIn = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn) : 0;
+
+        // Prevent backward mileage
+        if (currentMileageIn < lastMileageIn) {
+            alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km).`);
+            return;
+        }
+
+        // Confirm if mileage is significantly different
+        const tolerance = 100; // km — adjust as needed
+        if (lastMileageIn > 0 && Math.abs(currentMileageIn - lastMileageIn) > tolerance) {
+            const confirm = window.confirm(
+                `The last recorded mileage for this vehicle was ${lastMileageIn} km.\n` +
+                `You entered ${currentMileageIn} km.\n\n` +
+                `Is this correct? Click "OK" to confirm or "Cancel" to review.`
+            );
+            if (!confirm) return; // Cancel submission
+        }
+
+        const distanceTraveled = currentMileageIn - lastMileageIn;
+
+        const completedRecord = {
+            ...outRecord,
+            mileageIn: currentMileageIn,
+            lastMileageIn: lastMileageIn,
+            distanceTraveled: distanceTraveled,
+            dateTimeIn: dateTimeIn,
+            fuelAmount: formData.get('fuelAmount') || '0',
+            completedTimestamp: new Date().toISOString()
+        };
+
+        outRecords = outRecords.filter(record => record.cardRegistration !== cardRegistration);
+        completedRecords.push(completedRecord);
+
+        refreshTables();
+        this.reset();
+        document.getElementById('driverNameIn').value = '';
+        document.getElementById('mileageIn').value = '';
+        document.getElementById('mileageHint').style.display = 'none';
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('dateTimeIn').value = now.toISOString().slice(0, 16);
+
+        alert('Vehicle checked in successfully!');
+        await saveToBin();
+    });
+
+    document.getElementById('cardRegistrationIn').addEventListener('change', function() {
+        const selectedCard = this.value;
+        const outRecord = outRecords.find(record => record.cardRegistration === selectedCard);
+        document.getElementById('driverNameIn').value = outRecord ? outRecord.driverName : '';
+
+        const lastCompletedTripForCard = completedRecords
+            .filter(record => record.cardRegistration === selectedCard)
+            .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
+            .at(0);
+        const lastMileageIn = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn) : 0;
+
+        const mileageInput = document.getElementById('mileageIn');
+        const hint = document.getElementById('mileageHint');
+
+        if (lastMileageIn > 0) {
+            hint.textContent = `Last recorded: ${lastMileageIn} km`;
+            hint.style.display = 'block';
+            mileageInput.value = lastMileageIn.toFixed(1);
+        } else {
+            hint.style.display = 'none';
+            mileageInput.value = '0';
+        }
+    });
+
+    // --- Modal logic ---
+    const adminModal = document.getElementById('adminModal');
+    const adminPassword = document.getElementById('adminPassword');
+    const adminError = document.getElementById('adminError');
+    const adminConfirmBtn = document.getElementById('adminConfirmBtn');
+    const adminCancelBtn = document.getElementById('adminCancelBtn');
+    let adminCallback = null;
+
+    function showAdminModal(callback) {
+        adminCallback = callback;
+        adminPassword.value = '';
+        adminError.textContent = '';
+        adminModal.style.display = 'flex';
+        adminPassword.focus();
+    }
+
+    function hideAdminModal() {
+        adminModal.style.display = 'none';
+        adminError.textContent = '';
+    }
+
+    adminConfirmBtn.onclick = function() {
+        const pass = adminPassword.value.trim();
+        if (pass === "Superb@786") {
+            hideAdminModal();
+            if (adminCallback) adminCallback(true);
+        } else if (pass === "Driver@123") {
+            adminError.textContent = "Not authorized. Only Admin can reset or view stats.";
+            setTimeout(() => { adminError.textContent = ''; }, 2500);
+        } else {
+            adminError.textContent = "Incorrect password.";
+            setTimeout(() => { adminError.textContent = ''; }, 2000);
+        }
+    };
+
+    adminCancelBtn.onclick = function() {
+        hideAdminModal();
+    };
+
+    adminPassword.onkeydown = function(e) {
+        if (e.key === 'Enter') adminConfirmBtn.onclick();
+    };
+
+    document.getElementById('clearAllBtn').addEventListener('click', function() {
+        showAdminModal(async function(authorized) {
+            if (authorized) {
+                if (confirm('Are you sure you want to CLEAR ALL data? This cannot be undone.')) {
+                    await clearData();
+                    alert('All records cleared!');
+                }
+            }
+        });
+    });
+
+    document.getElementById('showStatsBtn').addEventListener('click', function() {
+        showAdminModal(function(authorized) {
+            if (authorized) {
+                isAdmin = true;
+                renderStats();
+            }
+        });
+    });
+
+    // --- Export Options Modal ---
+    const exportModal = document.getElementById('exportModal');
+    document.getElementById('exportCsvBtn').addEventListener('click', showExportModal);
+    document.getElementById('exportLifeToDateBtn').addEventListener('click', function() {
+        hideExportModal();
+        exportLifeToDateCSV();
+    });
+    document.getElementById('exportMonthToDateBtn').addEventListener('click', function() {
+        hideExportModal();
+        exportMonthToDateCSV();
+    });
+    document.getElementById('exportCancelBtn').addEventListener('click', hideExportModal);
+
+    window.addEventListener('click', function(event) {
+        if (event.target === adminModal) hideAdminModal();
+        if (event.target === exportModal) hideExportModal();
+    });
+
+    // --- Accordion Logic ---
+    document.querySelectorAll('.collapsible-section .section-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            this.classList.toggle('active');
+            content.classList.toggle('active');
+            if (content.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = null;
+            }
+        });
+    });
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', async function() {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        const currentTime = now.toISOString().slice(0, 16);
+        document.getElementById('dateTimeOut').value = currentTime;
+        document.getElementById('dateTimeIn').value = currentTime;
+        await loadFromBin();
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.collapsible-section .collapsible-content').forEach(content => {
+                content.style.maxHeight = null;
+                content.previousElementSibling.classList.remove('active');
+                content.classList.remove('active');
+            });
+        }
+    });
+</script>
 </body>
 </html>
