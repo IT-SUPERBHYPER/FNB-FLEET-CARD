@@ -271,6 +271,7 @@
                 <div class="stats-panel" id="statsPanel" style="display:none"></div>
                 <div class="data-tools">
                     <button id="exportCsvBtn">Export CSV</button>
+                    <button id="migrateToFirebaseBtn">📤 Migrate to Firebase</button>
                     <button id="clearAllBtn">Clear All Data</button>
                 </div>
             </div>
@@ -411,15 +412,90 @@
         <button id="exportCancelBtn">Cancel</button>
     </div>
 </div>
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore-compat.js"></script>
+
 <script>
-    // === JSONBin Config - CORRECTED SECRET KEY ===
+    // === JSONBin Config ===
     const JSONBIN_ID = '686cdbfa8a456b7966bd5883';
-    const JSONBIN_SECRET = '$2a$10$BqM/s2f2kqZGoB5V14WtWOPOVO5/ccx/wZtBqmQsgeQqh6WMp42We'; // ✅ Correct key
+    const JSONBIN_SECRET = '$2a$10$BqM/s2f2kqZGoB5V14WtWOPOVO5/ccx/wZtBqmQsgeQqh6WMp42We';
     const JSONBIN_URL = `https://api.jsonbin.io/v3/b/686cdbfa8a456b7966bd5883`;
     let outRecords = [];
     let completedRecords = [];
     let isLoaded = false;
     let isAdmin = false;
+
+    // =============== FIREBASE MIGRATION LOGIC ===============
+    let firebaseApp = null;
+    let db = null;
+
+    function initFirebase() {
+        if (!firebaseApp) {
+            const config = {
+                apiKey: "AIzaSyDKpWycZRpAS7uFKfZaQ-un8ojGclndvSU",
+                authDomain: "fnb-fleet-93b54.firebaseapp.com",
+                projectId: "fnb-fleet-93b54",
+                storageBucket: "fnb-fleet-93b54.firebasestorage.app",
+                messagingSenderId: "827624569947",
+                appId: "1:827624569947:web:dc7f6f555435d09e76937e"
+            };
+            firebaseApp = firebase.initializeApp(config);
+            db = firebase.firestore();
+        }
+    }
+
+    async function migrateToFirebase() {
+        if (!confirm('⚠️ This will COPY all current data to Firebase Firestore.\nExisting Firestore data will be REPLACED.\nProceed?')) return;
+
+        try {
+            // Ensure we have latest data
+            await loadFromBin();
+
+            initFirebase();
+
+            const btn = document.getElementById('migrateToFirebaseBtn');
+            btn.disabled = true;
+            btn.textContent = 'Migrating...';
+
+            // Clear existing Firestore collections
+            const outSnap = await db.collection('outRecords').get();
+            const inSnap = await db.collection('completedRecords').get();
+            const batch1 = db.batch();
+            outSnap.docs.forEach(doc => batch1.delete(doc.ref));
+            await batch1.commit();
+
+            const batch2 = db.batch();
+            inSnap.docs.forEach(doc => batch2.delete(doc.ref));
+            await batch2.commit();
+
+            // Add outRecords
+            const batchOut = db.batch();
+            outRecords.forEach(rec => {
+                batchOut.set(db.collection('outRecords').doc(), rec);
+            });
+            await batchOut.commit();
+
+            // Add completedRecords
+            const batchIn = db.batch();
+            completedRecords.forEach(rec => {
+                batchIn.set(db.collection('completedRecords').doc(), rec);
+            });
+            await batchIn.commit();
+
+            alert('✅ Migration to Firebase completed successfully!');
+            btn.textContent = '✅ Migrated!';
+            btn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+        } catch (err) {
+            console.error('Migration failed:', err);
+            alert('❌ Migration failed:\n' + (err.message || err));
+            document.getElementById('migrateToFirebaseBtn').disabled = false;
+            document.getElementById('migrateToFirebaseBtn').textContent = '📤 Migrate to Firebase';
+        }
+    }
+
+    // =============== END FIREBASE MIGRATION ===============
 
     function formatDateTime(dateTimeString) {
         if (!dateTimeString) return '';
@@ -447,12 +523,10 @@
         const totalDistanceTraveled = completedRecords.reduce((sum, r) => sum + parseFloat(r.distanceTraveled || 0), 0);
         const avgFuel = totalTrips ? (totalFuel / totalTrips) : 0;
         const avgDistanceTraveled = totalTrips ? (totalDistanceTraveled / totalTrips) : 0;
-
         let mostRecent = null;
         if (completedRecords.length) {
             mostRecent = completedRecords.reduce((a, b) => (a.dateTimeIn > b.dateTimeIn ? a : b));
         }
-
         let driverCounts = {};
         completedRecords.forEach(r => {
             driverCounts[r.driverName] = (driverCounts[r.driverName] || 0) + 1;
@@ -464,7 +538,6 @@
                 mostActiveDriver = driver;
             }
         }
-
         let html = `
           <div class="stat-card"><div class="stat-icon">🚗</div>
             <div class="stat-value">${totalOut}</div>
@@ -550,19 +623,16 @@
         const inRecordsBody = document.getElementById('inRecordsBody');
         outRecordsBody.innerHTML = '';
         inRecordsBody.innerHTML = '';
-
         if (outRecords.length === 0) {
             outRecordsBody.innerHTML = '<tr><td colspan="4" class="empty-table-message">No vehicles currently checked out.</td></tr>';
         } else {
             outRecords.forEach(addOutRecordToTable);
         }
-
         if (completedRecords.length === 0) {
             inRecordsBody.innerHTML = '<tr><td colspan="6" class="empty-table-message">No completed trips yet.</td></tr>';
         } else {
             completedRecords.forEach(addCompletedRecordToTable);
         }
-
         updateCardDropdown();
         renderStats();
     }
@@ -583,24 +653,16 @@
             const currentYear = now.getFullYear();
             const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
             const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-
             completedRecords = (data.record.completedRecords || []).filter(record => {
                 const dateIn = new Date(record.dateTimeIn);
                 const recordMonth = dateIn.getMonth();
                 const recordYear = dateIn.getFullYear();
                 return !(recordMonth === lastMonth && recordYear === lastMonthYear);
             });
-
             refreshTables();
-
-            const totalOriginal = (data.record.completedRecords || []).length;
-            const removed = totalOriginal - completedRecords.length;
-            if (removed > 0) {
-                alert(`Loaded data. Removed ${removed} record(s) from last month.`);
-            }
         } catch (err) {
             console.error('Load error:', err);
-            alert('Failed to load or clean data: ' + (err.message || err));
+            alert('Failed to load data: ' + (err.message || err));
             outRecords = [];
             completedRecords = [];
             refreshTables();
@@ -624,7 +686,6 @@
                 const error = await res.json().catch(() => ({}));
                 throw new Error(error.message || `HTTP ${res.status}`);
             }
-            console.log("Saved successfully!");
         } catch (err) {
             console.error('Save error:', err);
             alert('Failed to save data.\n' + err.message);
@@ -697,14 +758,6 @@
         URL.revokeObjectURL(url);
     }
 
-    function showExportModal() {
-        exportModal.style.display = 'flex';
-    }
-
-    function hideExportModal() {
-        exportModal.style.display = 'none';
-    }
-
     document.getElementById('vehicleOutForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -741,64 +794,50 @@
         }
     });
 
-    // Enhanced vehicle in form with mileage confirmation
     document.getElementById('vehicleInForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         const cardRegistration = formData.get('cardRegistrationIn');
         const fuelAmount = parseFloat(formData.get('fuelAmount')) || 0;
-
         if (fuelAmount > 2500) {
             alert('Fuel amount cannot exceed R2500!');
             return;
         }
-
         const outRecord = outRecords.find(record => record.cardRegistration === cardRegistration);
         if (!outRecord) {
             alert('No checkout record found for this vehicle!');
             return;
         }
-
         const dateTimeIn = formData.get('dateTimeIn');
         if (new Date(dateTimeIn) <= new Date(outRecord.dateTimeOut)) {
             alert('Date/Time In must be after Date/Time Out!');
             return;
         }
-
         const mileageInInput = formData.get('mileageIn');
         if (!mileageInInput || isNaN(parseFloat(mileageInInput))) {
             alert('Please enter a valid Mileage In value.');
             return;
         }
-
         const currentMileageIn = parseFloat(mileageInInput);
-
-        // Get last recorded mileage
         const lastCompletedTripForCard = completedRecords
             .filter(record => record.cardRegistration === cardRegistration)
             .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
             .at(0);
         const lastMileageIn = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn) : 0;
-
-        // Prevent backward mileage
         if (currentMileageIn < lastMileageIn) {
             alert(`Mileage In (${currentMileageIn} km) cannot be less than the previous recorded mileage (${lastMileageIn} km).`);
             return;
         }
-
-        // Confirm if mileage is significantly different
-        const tolerance = 100; // km — adjust as needed
+        const tolerance = 100;
         if (lastMileageIn > 0 && Math.abs(currentMileageIn - lastMileageIn) > tolerance) {
             const confirm = window.confirm(
                 `The last recorded mileage for this vehicle was ${lastMileageIn} km.\n` +
-                `You entered ${currentMileageIn} km.\n\n` +
+                `You entered ${currentMileageIn} km.\n` +
                 `Is this correct? Click "OK" to confirm or "Cancel" to review.`
             );
-            if (!confirm) return; // Cancel submission
+            if (!confirm) return;
         }
-
         const distanceTraveled = currentMileageIn - lastMileageIn;
-
         const completedRecord = {
             ...outRecord,
             mileageIn: currentMileageIn,
@@ -808,10 +847,8 @@
             fuelAmount: formData.get('fuelAmount') || '0',
             completedTimestamp: new Date().toISOString()
         };
-
         outRecords = outRecords.filter(record => record.cardRegistration !== cardRegistration);
         completedRecords.push(completedRecord);
-
         refreshTables();
         this.reset();
         document.getElementById('driverNameIn').value = '';
@@ -820,7 +857,6 @@
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('dateTimeIn').value = now.toISOString().slice(0, 16);
-
         alert('Vehicle checked in successfully!');
         await saveToBin();
     });
@@ -829,16 +865,13 @@
         const selectedCard = this.value;
         const outRecord = outRecords.find(record => record.cardRegistration === selectedCard);
         document.getElementById('driverNameIn').value = outRecord ? outRecord.driverName : '';
-
         const lastCompletedTripForCard = completedRecords
             .filter(record => record.cardRegistration === selectedCard)
             .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))
             .at(0);
         const lastMileageIn = lastCompletedTripForCard ? parseFloat(lastCompletedTripForCard.mileageIn) : 0;
-
         const mileageInput = document.getElementById('mileageIn');
         const hint = document.getElementById('mileageHint');
-
         if (lastMileageIn > 0) {
             hint.textContent = `Last recorded: ${lastMileageIn} km`;
             hint.style.display = 'block';
@@ -914,20 +947,20 @@
 
     // --- Export Options Modal ---
     const exportModal = document.getElementById('exportModal');
-    document.getElementById('exportCsvBtn').addEventListener('click', showExportModal);
-    document.getElementById('exportLifeToDateBtn').addEventListener('click', function() {
-        hideExportModal();
+    document.getElementById('exportCsvBtn').addEventListener('click', () => exportModal.style.display = 'flex');
+    document.getElementById('exportLifeToDateBtn').addEventListener('click', () => {
+        exportModal.style.display = 'none';
         exportLifeToDateCSV();
     });
-    document.getElementById('exportMonthToDateBtn').addEventListener('click', function() {
-        hideExportModal();
+    document.getElementById('exportMonthToDateBtn').addEventListener('click', () => {
+        exportModal.style.display = 'none';
         exportMonthToDateCSV();
     });
-    document.getElementById('exportCancelBtn').addEventListener('click', hideExportModal);
+    document.getElementById('exportCancelBtn').addEventListener('click', () => exportModal.style.display = 'none');
 
     window.addEventListener('click', function(event) {
         if (event.target === adminModal) hideAdminModal();
-        if (event.target === exportModal) hideExportModal();
+        if (event.target === exportModal) exportModal.style.display = 'none';
     });
 
     // --- Accordion Logic ---
@@ -936,11 +969,6 @@
             const content = this.nextElementSibling;
             this.classList.toggle('active');
             content.classList.toggle('active');
-            if (content.classList.contains('active')) {
-                content.style.maxHeight = content.scrollHeight + "px";
-            } else {
-                content.style.maxHeight = null;
-            }
         });
     });
 
@@ -952,14 +980,19 @@
         document.getElementById('dateTimeOut').value = currentTime;
         document.getElementById('dateTimeIn').value = currentTime;
         await loadFromBin();
-        if ('serviceWorker' in navigator) {
+
+        // Register Service Worker only if not file://
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
             navigator.serviceWorker.register('service-worker.js');
         }
+
+        // Add migrate button listener
+        document.getElementById('migrateToFirebaseBtn').addEventListener('click', migrateToFirebase);
+
         if (window.innerWidth <= 768) {
             document.querySelectorAll('.collapsible-section .collapsible-content').forEach(content => {
-                content.style.maxHeight = null;
-                content.previousElementSibling.classList.remove('active');
                 content.classList.remove('active');
+                content.previousElementSibling.classList.remove('active');
             });
         }
     });
