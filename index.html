@@ -823,34 +823,124 @@
   }
 
   function exportLifeToDateCSV() {
-    let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
-    completedRecords.forEach(record => {
+    let csv = "Vehicle Reg,Driver,Status,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
+    
+    // Export ALL records - both out and completed
+    const allRecords = [
+      ...outRecords.map(record => ({ 
+        ...record, 
+        status: 'OUT',
+        dateTimeIn: '',
+        mileageIn: 0,
+        fuelAmount: 0,
+        distanceTraveled: 0
+      })),
+      ...completedRecords.map(record => ({ 
+        ...record, 
+        status: 'COMPLETED',
+        distanceTraveled: record.distanceTraveled || 0
+      }))
+    ];
+    
+    // Sort by date (newest first)
+    allRecords.sort((a, b) => {
+      const dateA = a.status === 'OUT' ? new Date(a.dateTimeOut) : new Date(a.dateTimeIn || a.dateTimeOut);
+      const dateB = b.status === 'OUT' ? new Date(b.dateTimeOut) : new Date(b.dateTimeIn || b.dateTimeOut);
+      return dateB - dateA;
+    });
+    
+    allRecords.forEach(record => {
       const dateOut = new Date(record.dateTimeOut);
       const monthOut = dateOut.toLocaleString('default', { month: 'long' });
-      csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
+      const yearOut = dateOut.getFullYear();
+      const monthYear = `${monthOut} ${yearOut}`;
+      
+      const dateOutFormatted = formatDateTime(record.dateTimeOut);
+      const dateInFormatted = record.status === 'COMPLETED' ? formatDateTime(record.dateTimeIn) : 'N/A';
+      const mileage = parseFloat(record.mileageIn || 0).toFixed(1);
+      const fuelAmount = parseFloat(record.fuelAmount || 0).toFixed(2);
+      const distance = parseFloat(record.distanceTraveled || 0).toFixed(1);
+      
+      csv += `"${record.cardRegistration}","${record.driverName}","${record.status}","${monthYear}","${dateOutFormatted}","${dateInFormatted}",${mileage},"R${fuelAmount}",${distance}\n`;
     });
+    
+    // Calculate totals only for completed records
     const totals = calculateExportTotals(completedRecords);
-    csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
-    downloadCSV(csv, "fleet_life_to_date.csv");
+    csv += `\nCompleted Trips Summary\n`;
+    csv += `Total Completed Trips:,${completedRecords.length}\n`;
+    csv += `Total Mileage:,"${totals.totalMileage}"\n`;
+    csv += `Total Fuel:,"R${totals.totalFuel}"\n`;
+    csv += `Total Distance:,"${totals.totalDistance}"\n`;
+    
+    downloadCSV(csv, "fleet_life_to_date_complete.csv");
   }
 
   function exportMonthToDateCSV() {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
-    const monthRecords = completedRecords.filter(record => {
+    const monthName = currentDate.toLocaleString('default', { month: 'long' });
+    
+    // Get all records from current month (based on check-out date for out records, check-in for completed)
+    const monthRecords = [
+      ...outRecords.filter(record => {
+        const recordDate = new Date(record.dateTimeOut);
+        return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
+      }).map(record => ({ 
+        ...record, 
+        status: 'OUT',
+        dateTimeIn: '',
+        mileageIn: 0,
+        fuelAmount: 0,
+        distanceTraveled: 0
+      })),
+      ...completedRecords.filter(record => {
+        const recordDate = new Date(record.dateTimeIn);
+        return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
+      }).map(record => ({ 
+        ...record, 
+        status: 'COMPLETED',
+        distanceTraveled: record.distanceTraveled || 0
+      }))
+    ];
+    
+    let csv = `Vehicle Reg,Driver,Status,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n`;
+    
+    // Sort by date (newest first)
+    monthRecords.sort((a, b) => {
+      const dateA = a.status === 'OUT' ? new Date(a.dateTimeOut) : new Date(a.dateTimeIn);
+      const dateB = b.status === 'OUT' ? new Date(b.dateTimeOut) : new Date(b.dateTimeIn);
+      return dateB - dateA;
+    });
+    
+    monthRecords.forEach(record => {
+      const dateOutFormatted = formatDateTime(record.dateTimeOut);
+      const dateInFormatted = record.status === 'COMPLETED' ? formatDateTime(record.dateTimeIn) : 'N/A';
+      const mileage = parseFloat(record.mileageIn || 0).toFixed(1);
+      const fuelAmount = parseFloat(record.fuelAmount || 0).toFixed(2);
+      const distance = parseFloat(record.distanceTraveled || 0).toFixed(1);
+      
+      csv += `"${record.cardRegistration}","${record.driverName}","${record.status}","${dateOutFormatted}","${dateInFormatted}",${mileage},"R${fuelAmount}",${distance}\n`;
+    });
+    
+    // Calculate totals only for completed records in this month
+    const monthCompletedRecords = completedRecords.filter(record => {
       const recordDate = new Date(record.dateTimeIn);
       return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
     });
-    let csv = "Vehicle Reg,Driver,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
-    monthRecords.forEach(record => {
-      const dateOut = new Date(record.dateTimeOut);
-      const monthOut = dateOut.toLocaleString('default', { month: 'long' });
-      csv += `"${record.cardRegistration}","${record.driverName}","${monthOut}","${formatDateTime(record.dateTimeOut)}","${formatDateTime(record.dateTimeIn)}",${parseFloat(record.mileageIn).toFixed(1)},"R${parseFloat(record.fuelAmount).toFixed(2)}",${parseFloat(record.distanceTraveled || 0).toFixed(1)}\n`;
-    });
-    const totals = calculateExportTotals(monthRecords);
-    csv += `\nTotal,,,"","","${totals.totalMileage}","R${totals.totalFuel}","${totals.totalDistance}"\n`;
-    const filename = `fleet_${currentDate.toLocaleString('default', { month: 'long' })}_${currentYear}.csv`;
+    
+    const totals = calculateExportTotals(monthCompletedRecords);
+    csv += `\n${monthName} ${currentYear} Summary\n`;
+    csv += `Current Out:,${outRecords.filter(record => {
+      const recordDate = new Date(record.dateTimeOut);
+      return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
+    }).length}\n`;
+    csv += `Completed Trips:,${monthCompletedRecords.length}\n`;
+    csv += `Total Mileage:,"${totals.totalMileage}"\n`;
+    csv += `Total Fuel:,"R${totals.totalFuel}"\n`;
+    csv += `Total Distance:,"${totals.totalDistance}"\n`;
+    
+    const filename = `fleet_${monthName}_${currentYear}_complete.csv`;
     downloadCSV(csv, filename);
   }
 
