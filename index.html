@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FNB Fleet Cards Record</title>
 <meta name="theme-color" content="#0f172a">
 <link rel="manifest" href="manifest.json">
@@ -55,6 +55,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
 }
 
 /* Background pattern */
@@ -79,7 +80,7 @@ body::before {
   z-index: 1;
 }
 
-/* Mobile overlay for sidebar */
+/* Mobile overlay for sidebar - FIXED: pointer-events when closed */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -88,11 +89,13 @@ body::before {
   z-index: 99;
   opacity: 0;
   transition: opacity 0.2s ease;
+  pointer-events: none; /* FIXED: Don't block clicks when closed */
 }
 
 .sidebar-overlay.active {
   display: block;
   opacity: 1;
+  pointer-events: auto; /* Only block when active */
 }
 
 /* Sidebar */
@@ -112,6 +115,17 @@ body::before {
   z-index: 100;
   scrollbar-width: thin;
   scrollbar-color: var(--navy-600) transparent;
+  /* FIXED: Ensure sidebar content is above overlay */
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translateX(-100%);
+  width: 280px;
+  box-shadow: var(--shadow-lg);
+}
+
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .sidebar::-webkit-scrollbar { width: 4px; }
@@ -179,7 +193,7 @@ body::before {
   width: 100%;
   text-align: left;
   position: relative;
-  min-height: 44px;
+  min-height: 48px; /* FIXED: Better touch target */
 }
 
 .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
@@ -249,13 +263,13 @@ body::before {
   color: var(--navy-400);
 }
 
-/* Mobile sidebar toggle */
+/* Mobile sidebar toggle - FIXED: Higher z-index */
 .sidebar-toggle {
   display: none;
   position: fixed;
   top: calc(16px + var(--safe-top));
   left: calc(16px + var(--safe-left));
-  z-index: 101;
+  z-index: 102; /* FIXED: Above overlay */
   width: 44px;
   height: 44px;
   border-radius: 12px;
@@ -272,13 +286,15 @@ body::before {
 
 .sidebar-toggle:active { transform: scale(0.95); }
 
-/* Main Content */
+/* Main Content - FIXED: Ensure content is interactive */
 .main {
   background: var(--navy-50);
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 100vh;
   min-height: -webkit-fill-available;
+  position: relative;
+  z-index: 1; /* FIXED: Above background, below sidebar */
 }
 
 .topbar {
@@ -329,8 +345,10 @@ body::before {
   border: none;
   transition: all 0.15s;
   text-decoration: none;
-  min-height: 40px;
-  min-width: 40px;
+  min-height: 44px; /* FIXED: Touch target */
+  min-width: 44px;
+  position: relative; /* FIXED: Ensure clickable */
+  z-index: 1;
 }
 
 .btn:active { transform: scale(0.98); }
@@ -367,7 +385,7 @@ body::before {
 
 .btn-success:hover { background: var(--emerald); color: #fff; }
 
-.btn-sm { padding: 8px 14px; font-size: 12px; min-height: 36px; }
+.btn-sm { padding: 8px 14px; font-size: 12px; min-height: 40px; }
 
 /* Content panels */
 .panel {
@@ -377,6 +395,8 @@ body::before {
   padding-bottom: calc(24px + var(--safe-bottom));
   padding-left: calc(24px + var(--safe-left));
   padding-right: calc(24px + var(--safe-right));
+  position: relative;
+  z-index: 1; /* FIXED: Ensure content is above background */
 }
 
 .panel.active { display: block; }
@@ -459,6 +479,8 @@ body::before {
   border: 1px solid var(--navy-200);
   box-shadow: var(--shadow);
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .card-header {
@@ -482,12 +504,12 @@ body::before {
 
 .card-body { padding: 20px; }
 
-/* Form Styles */
+/* Form Styles - FIXED: Ensure inputs are interactive */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
 .form-row.one { grid-template-columns: 1fr; }
 
-.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; position: relative; z-index: 2; }
 
 .form-group label {
   font-size: 11px;
@@ -503,14 +525,16 @@ body::before {
   padding: 12px 14px;
   border: 1.5px solid var(--navy-200);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 16px; /* FIXED: Prevent iOS zoom */
   font-family: 'DM Sans', sans-serif;
   color: var(--navy);
   background: var(--navy-50);
   transition: all 0.15s;
   outline: none;
   width: 100%;
-  min-height: 44px;
+  min-height: 48px; /* FIXED: Touch target */
+  position: relative;
+  z-index: 2; /* FIXED: Above any overlays */
 }
 
 .form-group input:focus,
@@ -519,6 +543,7 @@ body::before {
   border-color: var(--gold);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+  z-index: 3; /* FIXED: Above siblings when focused */
 }
 
 .form-group input[readonly] {
@@ -545,6 +570,8 @@ body::before {
   -webkit-overflow-scrolling: touch;
   margin: 0 -20px;
   padding: 0 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .table-wrapper::-webkit-scrollbar { height: 4px; }
@@ -724,9 +751,13 @@ tbody td {
   padding: 20px;
   padding-top: calc(20px + var(--safe-top));
   padding-bottom: calc(20px + var(--safe-bottom));
+  pointer-events: none;
 }
 
-.modal-overlay.open { display: flex; }
+.modal-overlay.open { 
+  display: flex;
+  pointer-events: auto;
+}
 
 .modal-box {
   background: #fff;
@@ -738,6 +769,7 @@ tbody td {
   animation: popIn 0.2s ease;
   max-height: 90vh;
   overflow-y: auto;
+  pointer-events: auto;
 }
 
 @keyframes popIn {
@@ -825,7 +857,9 @@ tbody td {
   font-family: 'DM Sans', sans-serif;
   transition: all 0.15s;
   white-space: nowrap;
-  min-height: 36px;
+  min-height: 40px;
+  position: relative;
+  z-index: 1;
 }
 
 .tab-btn:active { transform: scale(0.98); }
@@ -866,43 +900,44 @@ tbody td {
 /* Search input */
 .search-input {
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 16px; /* FIXED: Prevent iOS zoom */
   border: 1px solid var(--navy-200);
   border-radius: var(--radius-sm);
   outline: none;
   font-family: inherit;
   width: 100%;
   max-width: 200px;
-  min-height: 36px;
+  min-height: 40px;
+  position: relative;
+  z-index: 2;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* Desktop styles - sidebar visible by default */
+@media (min-width: 1025px) {
+  .sidebar {
+    position: sticky;
+    transform: translateX(0) !important;
+    box-shadow: none;
+  }
+  
+  .sidebar-toggle,
+  .sidebar-overlay {
+    display: none !important;
+  }
+  
+  .topbar {
+    padding-left: calc(24px + var(--safe-left));
   }
   
   .app-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: 260px 1fr;
   }
-  
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    height: -webkit-fill-available;
-    transform: translateX(-100%);
-    width: 280px;
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  
-  .sidebar-toggle {
-    display: flex;
+}
+
+/* Tablet & Mobile */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .topbar {
@@ -923,10 +958,6 @@ tbody td {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-  }
-  
-  .card-header > div:last-child {
-    width: 100%;
   }
   
   .search-input {
@@ -971,13 +1002,13 @@ tbody td {
   .btn {
     padding: 9px 14px;
     font-size: 12px;
-    min-height: 38px;
+    min-height: 44px;
   }
   
   .btn-sm {
     padding: 7px 12px;
     font-size: 11px;
-    min-height: 34px;
+    min-height: 40px;
   }
   
   .panel {
@@ -1007,8 +1038,8 @@ tbody td {
   .form-group select,
   .form-group textarea {
     padding: 11px 12px;
-    font-size: 14px;
-    min-height: 42px;
+    font-size: 16px;
+    min-height: 48px;
   }
   
   .form-group label {
@@ -1103,9 +1134,9 @@ tbody td {
   }
   
   .sidebar-toggle {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
     top: calc(12px + var(--safe-top));
     left: calc(12px + var(--safe-left));
   }
@@ -1118,7 +1149,7 @@ tbody td {
   .nav-item {
     padding: 14px 20px;
     font-size: 15px;
-    min-height: 48px;
+    min-height: 52px;
   }
   
   .nav-icon {
@@ -1155,12 +1186,6 @@ tbody td {
     grid-template-columns: 1fr !important;
   }
   
-  /* Fuel stats grid removed, but keeping pattern for other grids */
-  .fuel-quick-grid,
-  [style*="grid-template-columns:repeat(3"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
   [style*="grid-template-columns:1fr 1.6fr"],
   [style*="grid-template-columns:1.4fr 1fr"] {
     grid-template-columns: 1fr !important;
@@ -1190,9 +1215,10 @@ tbody td {
   
   .form-group input,
   .form-group select,
-  .form-group textarea {
+  .form-group textarea,
+  .search-input {
     min-height: 48px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
   }
   
   input[type="datetime-local"] {
@@ -1202,7 +1228,7 @@ tbody td {
 
 /* Print styles */
 @media print {
-  .sidebar, .topbar, .btn, .form-actions, .action-cell {
+  .sidebar, .topbar, .btn, .form-actions, .action-cell, .sidebar-toggle, .sidebar-overlay {
     display: none !important;
   }
   
@@ -1229,14 +1255,14 @@ tbody td {
 </head>
 <body>
 
-<!-- Mobile sidebar overlay -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<!-- Mobile sidebar overlay - FIXED: proper pointer-events -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- Mobile sidebar toggle button -->
-<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+<!-- Mobile sidebar toggle button - FIXED: higher z-index -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">☰</button>
 
 <div class="app-shell">
-  <!-- Sidebar -->
+  <!-- Sidebar - FIXED: proper positioning -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-icon">🚗</div>
@@ -1687,7 +1713,6 @@ function renderDashboard() {
   document.getElementById('statCompleted').textContent = todayCompleted.length;
   document.getElementById('statCompletedChange').textContent = `+${weekCompleted.length} this week`;
 
-  // Avg duration
   const durs = allCompleted.filter(r => r.dateTimeIn && r.dateTimeOut).map(r => new Date(r.dateTimeIn) - new Date(r.dateTimeOut)).filter(d => d > 0);
   if (durs.length > 0) {
     const avg = durs.reduce((a,b)=>a+b,0)/durs.length;
@@ -1695,7 +1720,6 @@ function renderDashboard() {
     document.getElementById('statAvgDuration').textContent = h > 0 ? `${h}h${m}m` : `${m}m`;
   }
 
-  // Active table
   const outBody = document.getElementById('dashOutBody');
   outBody.innerHTML = '';
   if (allOut.length === 0) {
@@ -1711,7 +1735,6 @@ function renderDashboard() {
     });
   }
 
-  // Recent trips
   const recentBody = document.getElementById('dashRecentBody');
   recentBody.innerHTML = '';
   const recent = [...allCompleted].sort((a,b) => new Date(b.dateTimeIn)-new Date(a.dateTimeIn)).slice(0,6);
@@ -1835,38 +1858,56 @@ function switchPanel(name, btn) {
   const titles = { dashboard:'Dashboard', checkout:'Check Out Vehicle', checkin:'Check In Vehicle', 'active-vehicles':'Active Vehicles', 'trip-history':'Trip History', admin:'Admin & Export' };
   document.getElementById('topbarTitle').textContent = titles[name] || name;
   
-  // Scroll to top on panel change (mobile)
   if (window.innerWidth <= 1024) {
     document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
 window.switchPanel = switchPanel;
 
-// ——— Mobile Sidebar ———
+// ——— Mobile Sidebar - FIXED: Proper overlay handling ———
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.toggle('open');
-  overlay.classList.toggle('active');
-  document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+  const isOpen = sidebar.classList.contains('open');
+  
+  if (isOpen) {
+    // Close sidebar
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  } else {
+    // Open sidebar
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
 }
 window.toggleSidebar = toggleSidebar;
 
+// FIXED: Always restore body scroll when closing
 function closeMobileSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  
   if (window.innerWidth <= 1024) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.remove('active');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
     document.body.style.overflow = '';
   }
 }
 window.closeMobileSidebar = closeMobileSidebar;
 
+// Close sidebar on overlay click - FIXED
+document.getElementById('sidebarOverlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeMobileSidebar();
+  }
+});
+
 // Close sidebar on resize if open
 window.addEventListener('resize', () => {
   if (window.innerWidth > 1024) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.remove('active');
-    document.body.style.overflow = '';
+    closeMobileSidebar();
   }
 });
 
@@ -2119,6 +2160,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     lastTouchEnd = now;
   }, { passive: false });
+
+  // FIXED: Ensure inputs can receive focus on mobile
+  document.addEventListener('touchstart', function() {}, {passive: true});
 
   if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
