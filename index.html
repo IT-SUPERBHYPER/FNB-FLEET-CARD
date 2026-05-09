@@ -14,7 +14,7 @@
         .container{max-width:800px;margin:0 auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);overflow:hidden;}
         /* Header */
         .header{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;padding:30px;text-align:center;position:relative;}
-        .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');pointer-events:none;}
+        .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');pointer-events:none;}
         .header h1{font-size:2.5em;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
         .header p{font-size:1.1em;opacity:0.9;position:relative;z-index:1;}
         /* Form & Content Containers */
@@ -25,9 +25,6 @@
         .form-group input,.form-group select,.form-group textarea{width:100%;padding:18px;border:2px solid #e1e8ed;border-radius:10px;font-size:1em;background:rgba(255,255,255,0.9);transition:all 0.3s ease;outline:none;}
         .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1);transform:translateY(-2px);}
         .form-group input[type="datetime-local"]{font-family:inherit;}
-        .fuel-amount{position:relative;}
-        .fuel-amount::before{content:'R';position:absolute;left:15px;top:50%;transform:translateY(-50%);font-weight:bold;color:#667eea;z-index:1;}
-        .fuel-amount input{padding-left:35px;}
         /* Section Headers */
         .section-header{background:linear-gradient(135deg,#2c5282 0%,#3182ce 100%);color:white;padding:20px;margin:30px -40px;border-radius:15px;text-align:center;box-shadow:0 5px 15px rgba(44,82,130,0.3); cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
         .section-header h2{font-size:1.5em;margin:0;font-weight:600;}
@@ -62,9 +59,6 @@
         .collapsible-content .submit-section {
             margin-bottom: 0;
         }
-        /* Specific section styles */
-        .out-records,.in-records{margin-top:30px;padding:20px;background:rgba(248,250,252,0.8);border-radius:15px;border:2px solid #e2e8f0;}
-        .out-records h3,.in-records h3{color:#2c5282;margin-bottom:15px;font-size:1.2em;}
         /* Status Badges */
         .status-badge{padding:5px 12px;border-radius:20px;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
         .status-out{background:#fed7d7;color:#c53030;}
@@ -75,7 +69,6 @@
         .submit-btn:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(102,126,234,0.4);}
         .submit-btn:active{transform:translateY(-1px);}
         /* Records Tables */
-        .records-section{margin-top:50px;padding-top:30px;border-top:2px solid #e1e8ed;}
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -152,18 +145,18 @@
             color:#fff;border:none;border-radius:20px;padding:12px 20px;font-size:0.98em;font-weight:600;cursor:pointer;transition:background 0.3s; margin-bottom:16px;
         }
         .show-stats-btn:hover {background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
-        /* Error message for fuel amount */
-        .fuel-error {
-            color: #c53030;
+        /* Cleanup Notice */
+        .cleanup-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 15px 0;
             font-size: 0.9em;
-            margin-top: 5px;
+            color: #856404;
             display: none;
         }
-        /* Mileage hint */
-        .mileage-hint {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
+        .cleanup-notice.show {
             display: block;
         }
         /* Mobile Specific Optimizations */
@@ -218,8 +211,6 @@
             #inRecordsTable td:nth-of-type(2)::before { content: "Driver:"; }
             #inRecordsTable td:nth-of-type(3)::before { content: "Date Out:"; }
             #inRecordsTable td:nth-of-type(4)::before { content: "Date In:"; }
-            #inRecordsTable td:nth-of-type(5)::before { content: "Distance Traveled:"; }
-            #inRecordsTable td:nth-of-type(6)::before { content: "Fuel Amount:"; }
             .records-table td:last-child {
                 border-bottom: 0;
             }
@@ -258,9 +249,11 @@
 <div class="container">
     <div class="header">
         <h1>🚗 FNB Fleet Cards Record</h1>
-        <p>Vehicle Usage & Fuel Tracking System</p>
+        <p>Vehicle Check-In / Check-Out System</p>
     </div>
     <div class="form-container">
+        <div class="cleanup-notice" id="cleanupNotice"></div>
+        
         <div class="collapsible-section">
             <div class="section-header" id="statsHeader">
                 <h2>📊 Stats & Admin Tools</h2>
@@ -272,6 +265,8 @@
                 <div class="data-tools">
                     <button id="exportCsvBtn">Export CSV</button>
                     <button id="clearAllBtn">Clear All Data</button>
+                    <button id="clearCompletedBtn">Clear Completed Trips</button>
+                    <button id="cleanupOldBtn">Cleanup Old Data</button>
                 </div>
             </div>
         </div>
@@ -325,19 +320,9 @@
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="mileageIn"><span class="icon">📊</span>Mileage In (km)</label>
-                            <input type="number" id="mileageIn" name="mileageIn" placeholder="0" min="0" step="0.1">
-                            <span id="mileageHint" class="mileage-hint" style="display:none;"></span>
-                        </div>
-                        <div class="form-group">
                             <label for="dateTimeIn"><span class="icon">🕐</span>Date & Time In</label>
                             <input type="datetime-local" id="dateTimeIn" name="dateTimeIn" required>
                         </div>
-                    </div>
-                    <div class="form-group fuel-amount">
-                        <label for="fuelAmount"><span class="icon">⛽</span>Fuel Slip Amount (Max: R2500)</label>
-                        <input type="number" id="fuelAmount" name="fuelAmount" placeholder="0.00" min="0" max="2500" step="0.01">
-                        <div id="fuelAmountError" class="fuel-error">Fuel amount cannot exceed R2500</div>
                     </div>
                     <div class="submit-section">
                         <button type="submit" class="submit-btn">🏠 Check In Vehicle</button>
@@ -380,8 +365,6 @@
                                 <th>Driver</th>
                                 <th>Date Out</th>
                                 <th>Date In</th>
-                                <th>Distance Traveled</th>
-                                <th>Fuel Amount</th>
                             </tr>
                         </thead>
                         <tbody id="inRecordsBody"></tbody>
@@ -416,7 +399,7 @@
 <script type="module">
   // Firebase imports
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
   // Firebase config
   const firebaseConfig = {
@@ -433,8 +416,10 @@
   const db = getFirestore(app);
 
   // App state
-  let outRecords = [];
-  let completedRecords = [];
+  let allOutRecords = [];       // Master list (all Firestore data)
+  let allCompletedRecords = []; // Master list (all Firestore data)
+  let outRecords = [];          // Display list (today onwards only)
+  let completedRecords = [];    // Display list (today onwards only)
   let isAdmin = false;
 
   // =============== Helper Functions ===============
@@ -450,6 +435,26 @@
     });
   }
 
+  function getStartOfToday() {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }
+
+  function isTodayOrLater(dateString) {
+    if (!dateString) return false;
+    const recordDate = new Date(dateString);
+    const startOfToday = getStartOfToday();
+    return recordDate >= startOfToday;
+  }
+
+  function filterRecordsForDisplay() {
+    outRecords = allOutRecords.filter(record => isTodayOrLater(record.dateTimeOut));
+    completedRecords = allCompletedRecords.filter(record => 
+      isTodayOrLater(record.dateTimeIn) || isTodayOrLater(record.dateTimeOut)
+    );
+  }
+
   function renderStats() {
     const statsPanel = document.getElementById('statsPanel');
     statsPanel.style.display = isAdmin ? '' : 'none';
@@ -460,14 +465,12 @@
     }
     const totalOut = outRecords.length;
     const totalTrips = completedRecords.length;
-    const totalFuel = completedRecords.reduce((sum, r) => sum + parseFloat(r.fuelAmount || 0), 0);
-    const totalDistanceTraveled = completedRecords.reduce((sum, r) => sum + parseFloat(r.distanceTraveled || 0), 0);
-    const avgFuel = totalTrips ? (totalFuel / totalTrips) : 0;
-    const avgDistanceTraveled = totalTrips ? (totalDistanceTraveled / totalTrips) : 0;
+    
     let mostRecent = null;
     if (completedRecords.length) {
       mostRecent = completedRecords.reduce((a, b) => (a.dateTimeIn > b.dateTimeIn ? a : b));
     }
+    
     let driverCounts = {};
     completedRecords.forEach(r => {
       driverCounts[r.driverName] = (driverCounts[r.driverName] || 0) + 1;
@@ -479,30 +482,15 @@
         mostActiveDriver = driver;
       }
     }
+    
     let html = `
       <div class="stat-card"><div class="stat-icon">🚗</div>
         <div class="stat-value">${totalOut}</div>
-        <div class="stat-label">Checked Out</div>
+        <div class="stat-label">Checked Out Today+</div>
       </div>
       <div class="stat-card"><div class="stat-icon">✅</div>
         <div class="stat-value">${totalTrips}</div>
-        <div class="stat-label">Completed Trips</div>
-      </div>
-      <div class="stat-card"><div class="stat-icon">⛽</div>
-        <div class="stat-value">R${totalFuel.toFixed(2)}</div>
-        <div class="stat-label">Fuel Total</div>
-      </div>
-      <div class="stat-card"><div class="stat-icon">🛣️</div>
-        <div class="stat-value">${totalDistanceTraveled.toFixed(1)} km</div>
-        <div class="stat-label">Distance Total</div>
-      </div>
-      <div class="stat-card"><div class="stat-icon">💸</div>
-        <div class="stat-value">R${avgFuel.toFixed(2)}</div>
-        <div class="stat-label">Avg Fuel/Trip</div>
-      </div>
-      <div class="stat-card"><div class="stat-icon">📊</div>
-        <div class="stat-value">${avgDistanceTraveled.toFixed(1)} km</div>
-        <div class="stat-label">Avg Distance/Trip</div>
+        <div class="stat-label">Completed Trips Today+</div>
       </div>
     `;
     if (mostRecent) {
@@ -527,7 +515,7 @@
   function updateCardDropdown() {
     const dropdown = document.getElementById('cardRegistrationIn');
     dropdown.innerHTML = '<option value="">Select Vehicle Registration</option>';
-    outRecords.forEach(record => {
+    allOutRecords.forEach(record => {
       const option = document.createElement('option');
       option.value = record.cardRegistration;
       option.textContent = `${record.cardRegistration} - ${record.driverName}`;
@@ -554,23 +542,24 @@
       <td>${record.driverName}</td>
       <td>${formatDateTime(record.dateTimeOut)}</td>
       <td>${formatDateTime(record.dateTimeIn)}</td>
-      <td>${parseFloat(record.distanceTraveled).toFixed(1)} km</td>
-      <td>R${parseFloat(record.fuelAmount).toFixed(2)}</td>
     `;
   }
 
   function refreshTables() {
+    filterRecordsForDisplay();
+    
     const outRecordsBody = document.getElementById('outRecordsBody');
     const inRecordsBody = document.getElementById('inRecordsBody');
     outRecordsBody.innerHTML = '';
     inRecordsBody.innerHTML = '';
+    
     if (outRecords.length === 0) {
-      outRecordsBody.innerHTML = '<tr><td colspan="4" class="empty-table-message">No vehicles currently checked out.</td></tr>';
+      outRecordsBody.innerHTML = '<tr><td colspan="4" class="empty-table-message">No vehicles checked out today or later.</td></tr>';
     } else {
       outRecords.forEach(addOutRecordToTable);
     }
     if (completedRecords.length === 0) {
-      inRecordsBody.innerHTML = '<tr><td colspan="6" class="empty-table-message">No completed trips yet.</td></tr>';
+      inRecordsBody.innerHTML = '<tr><td colspan="4" class="empty-table-message">No completed trips today or later.</td></tr>';
     } else {
       completedRecords.forEach(addCompletedRecordToTable);
     }
@@ -584,18 +573,19 @@
       const outSnapshot = await getDocs(collection(db, 'outRecords'));
       const inSnapshot = await getDocs(collection(db, 'completedRecords'));
 
-      outRecords = outSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      completedRecords = inSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      allOutRecords = outSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      allCompletedRecords = inSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Remove last month’s records (as in original logic)
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-      completedRecords = completedRecords.filter(record => {
-        const dateIn = new Date(record.dateTimeIn);
-        return !(dateIn.getMonth() === (currentMonth === 0 ? 11 : currentMonth - 1) &&
-                 dateIn.getFullYear() === (currentMonth === 0 ? currentYear - 1 : currentYear));
-      });
+      const oldOutCount = allOutRecords.filter(r => !isTodayOrLater(r.dateTimeOut)).length;
+      const oldInCount = allCompletedRecords.filter(r => !isTodayOrLater(r.dateTimeIn) && !isTodayOrLater(r.dateTimeOut)).length;
+      const cleanupNotice = document.getElementById('cleanupNotice');
+      if (oldOutCount > 0 || oldInCount > 0) {
+        cleanupNotice.classList.add('show');
+        cleanupNotice.textContent = `⚠️ ${oldOutCount} old checkout(s) and ${oldInCount} old trip(s) hidden. Use "Cleanup Old Data" to permanently remove them.`;
+      } else {
+        cleanupNotice.classList.remove('show');
+        cleanupNotice.textContent = '';
+      }
 
       refreshTables();
     } catch (err) {
@@ -621,11 +611,50 @@
     await Promise.all([...deleteOutPromises, ...deleteInPromises]);
   }
 
+  async function cleanupOldRecordsFromFirestore() {
+    const batch = writeBatch(db);
+    let deletedCount = 0;
+    
+    const outSnapshot = await getDocs(collection(db, 'outRecords'));
+    outSnapshot.docs.forEach(docSnap => {
+      if (!isTodayOrLater(docSnap.data().dateTimeOut)) {
+        batch.delete(docSnap.ref);
+        deletedCount++;
+      }
+    });
+    
+    const inSnapshot = await getDocs(collection(db, 'completedRecords'));
+    inSnapshot.docs.forEach(docSnap => {
+      const data = docSnap.data();
+      if (!isTodayOrLater(data.dateTimeIn) && !isTodayOrLater(data.dateTimeOut)) {
+        batch.delete(docSnap.ref);
+        deletedCount++;
+      }
+    });
+    
+    if (deletedCount > 0) {
+      await batch.commit();
+    }
+    return deletedCount;
+  }
+
+  async function clearCompletedTripsFromFirestore() {
+    const batch = writeBatch(db);
+    const completedSnapshot = await getDocs(collection(db, 'completedRecords'));
+    completedSnapshot.docs.forEach(docSnap => {
+      batch.delete(docSnap.ref);
+    });
+    if (!completedSnapshot.empty) {
+      await batch.commit();
+    }
+    return !completedSnapshot.empty;
+  }
+
   // =============== Event Listeners ===============
   document.getElementById('vehicleOutForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const cardReg = document.getElementById('cardRegistrationOut').value.trim();
-    if (outRecords.some(r => r.cardRegistration === cardReg)) {
+    if (allOutRecords.some(r => r.cardRegistration === cardReg)) {
       alert('Vehicle already checked out!');
       return;
     }
@@ -638,7 +667,7 @@
     };
 
     await addOutRecord(record);
-    outRecords.push(record);
+    allOutRecords.push(record);
     refreshTables();
     this.reset();
 
@@ -648,29 +677,10 @@
     alert('Vehicle checked out successfully!');
   });
 
-  document.getElementById('fuelAmount').addEventListener('input', function() {
-    const fuelAmount = parseFloat(this.value) || 0;
-    const errorDiv = document.getElementById('fuelAmountError');
-    if (fuelAmount > 2500) {
-      errorDiv.style.display = 'block';
-      this.style.borderColor = '#c53030';
-    } else {
-      errorDiv.style.display = 'none';
-      this.style.borderColor = '#e1e8ed';
-    }
-  });
-
   document.getElementById('vehicleInForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const cardReg = document.getElementById('cardRegistrationIn').value;
-    const fuelAmount = parseFloat(document.getElementById('fuelAmount').value) || 0;
-
-    if (fuelAmount > 2500) {
-      alert('Fuel amount cannot exceed R2500!');
-      return;
-    }
-
-    const outRecord = outRecords.find(r => r.cardRegistration === cardReg);
+    const outRecord = allOutRecords.find(r => r.cardRegistration === cardReg);
     if (!outRecord) return alert('No checkout found!');
 
     const dateTimeIn = document.getElementById('dateTimeIn').value;
@@ -678,41 +688,18 @@
       return alert('Check-in time must be after check-out!');
     }
 
-    const mileageIn = parseFloat(document.getElementById('mileageIn').value);
-    if (isNaN(mileageIn)) return alert('Enter valid mileage.');
-
-    const lastTrip = completedRecords
-      .filter(r => r.cardRegistration === cardReg)
-      .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))[0];
-
-    const lastMileage = lastTrip ? parseFloat(lastTrip.mileageIn) : 0;
-    if (mileageIn < lastMileage) {
-      return alert(`Mileage cannot be less than ${lastMileage} km.`);
-    }
-
-    if (lastMileage > 0 && Math.abs(mileageIn - lastMileage) > 100) {
-      if (!confirm(`Last mileage: ${lastMileage} km\nYou entered: ${mileageIn} km\nConfirm?`)) return;
-    }
-
-    const distance = mileageIn - lastMileage;
     const completedRecord = {
       ...outRecord,
-      mileageIn: mileageIn,
-      lastMileageIn: lastMileage,
-      distanceTraveled: distance,
       dateTimeIn: dateTimeIn,
-      fuelAmount: fuelAmount.toString(),
       completedTimestamp: new Date().toISOString()
     };
 
     await completeTrip(outRecord.id, completedRecord);
-
-    outRecords = outRecords.filter(r => r.cardRegistration !== cardReg);
-    completedRecords.push(completedRecord);
+    allOutRecords = allOutRecords.filter(r => r.cardRegistration !== cardReg);
+    allCompletedRecords.push(completedRecord);
     refreshTables();
     this.reset();
     document.getElementById('driverNameIn').value = '';
-    document.getElementById('mileageHint').style.display = 'none';
 
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -722,21 +709,8 @@
 
   document.getElementById('cardRegistrationIn').addEventListener('change', function() {
     const selectedCard = this.value;
-    const outRecord = outRecords.find(record => record.cardRegistration === selectedCard);
+    const outRecord = allOutRecords.find(record => record.cardRegistration === selectedCard);
     document.getElementById('driverNameIn').value = outRecord ? outRecord.driverName : '';
-    const lastTrip = completedRecords
-      .filter(record => record.cardRegistration === selectedCard)
-      .sort((a, b) => new Date(b.dateTimeIn) - new Date(a.dateTimeIn))[0];
-    const lastMileage = lastTrip ? parseFloat(lastTrip.mileageIn) : 0;
-    const hint = document.getElementById('mileageHint');
-    if (lastMileage > 0) {
-      hint.textContent = `Last recorded: ${lastMileage} km`;
-      hint.style.display = 'block';
-      document.getElementById('mileageIn').value = lastMileage.toFixed(1);
-    } else {
-      hint.style.display = 'none';
-      document.getElementById('mileageIn').value = '0';
-    }
   });
 
   // --- Modal logic ---
@@ -787,10 +761,45 @@
       if (authorized) {
         if (confirm('Are you sure you want to CLEAR ALL data? This cannot be undone.')) {
           await clearAllDataFromFirestore();
-          outRecords = [];
-          completedRecords = [];
+          allOutRecords = [];
+          allCompletedRecords = [];
           refreshTables();
           alert('All records cleared!');
+        }
+      }
+    });
+  });
+
+  document.getElementById('clearCompletedBtn').addEventListener('click', function() {
+    showAdminModal(async function(authorized) {
+      if (authorized) {
+        if (confirm('Clear all completed trips? Currently checked-out vehicles will not be affected.')) {
+          const cleared = await clearCompletedTripsFromFirestore();
+          if (cleared) {
+            allCompletedRecords = [];
+            refreshTables();
+          }
+          // Silent success per your preference
+        }
+      }
+    });
+  });
+
+  document.getElementById('cleanupOldBtn').addEventListener('click', function() {
+    showAdminModal(async function(authorized) {
+      if (authorized) {
+        const oldOut = allOutRecords.filter(r => !isTodayOrLater(r.dateTimeOut)).length;
+        const oldIn = allCompletedRecords.filter(r => !isTodayOrLater(r.dateTimeIn) && !isTodayOrLater(r.dateTimeOut)).length;
+        const totalOld = oldOut + oldIn;
+        
+        if (totalOld === 0) {
+          alert('No old records to clean up! All data is from today onwards.');
+          return;
+        }
+        
+        if (confirm(`This will permanently delete ${totalOld} old record(s) from before today.\n\n${oldOut} checkout(s) and ${oldIn} trip(s) will be removed.\n\nContinue?`)) {
+          await cleanupOldRecordsFromFirestore();
+          await loadFromFirestore();
         }
       }
     });
@@ -806,73 +815,24 @@
   });
 
   // --- Export Functions (Client-side only) ---
-  function calculateExportTotals(records) {
-    let totalMileage = 0;
-    let totalFuel = 0;
-    let totalDistance = 0;
-    records.forEach(record => {
-      totalMileage += parseFloat(record.mileageIn || 0);
-      totalFuel += parseFloat(record.fuelAmount || 0);
-      totalDistance += parseFloat(record.distanceTraveled || 0);
-    });
-    return {
-      totalMileage: totalMileage.toFixed(1),
-      totalFuel: totalFuel.toFixed(2),
-      totalDistance: totalDistance.toFixed(1)
-    };
-  }
-
   function exportLifeToDateCSV() {
-    let csv = "Vehicle Reg,Driver,Status,Month,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n";
-    
-    // Export ALL records - both out and completed
+    let csv = "Vehicle Reg,Driver,Status,Date Out,Date In\n";
     const allRecords = [
-      ...outRecords.map(record => ({ 
-        ...record, 
-        status: 'OUT',
-        dateTimeIn: '',
-        mileageIn: 0,
-        fuelAmount: 0,
-        distanceTraveled: 0
-      })),
-      ...completedRecords.map(record => ({ 
-        ...record, 
-        status: 'COMPLETED',
-        distanceTraveled: record.distanceTraveled || 0
-      }))
+      ...allOutRecords.map(record => ({ ...record, status: 'OUT', dateTimeIn: '' })),
+      ...allCompletedRecords.map(record => ({ ...record, status: 'COMPLETED' }))
     ];
-    
-    // Sort by date (newest first)
     allRecords.sort((a, b) => {
       const dateA = a.status === 'OUT' ? new Date(a.dateTimeOut) : new Date(a.dateTimeIn || a.dateTimeOut);
       const dateB = b.status === 'OUT' ? new Date(b.dateTimeOut) : new Date(b.dateTimeIn || b.dateTimeOut);
       return dateB - dateA;
     });
-    
     allRecords.forEach(record => {
-      const dateOut = new Date(record.dateTimeOut);
-      const monthOut = dateOut.toLocaleString('default', { month: 'long' });
-      const yearOut = dateOut.getFullYear();
-      const monthYear = `${monthOut} ${yearOut}`;
-      
       const dateOutFormatted = formatDateTime(record.dateTimeOut);
       const dateInFormatted = record.status === 'COMPLETED' ? formatDateTime(record.dateTimeIn) : 'N/A';
-      const mileage = parseFloat(record.mileageIn || 0).toFixed(1);
-      const fuelAmount = parseFloat(record.fuelAmount || 0).toFixed(2);
-      const distance = parseFloat(record.distanceTraveled || 0).toFixed(1);
-      
-      csv += `"${record.cardRegistration}","${record.driverName}","${record.status}","${monthYear}","${dateOutFormatted}","${dateInFormatted}",${mileage},"R${fuelAmount}",${distance}\n`;
+      csv += `"${record.cardRegistration}","${record.driverName}","${record.status}","${dateOutFormatted}","${dateInFormatted}"\n`;
     });
-    
-    // Calculate totals only for completed records
-    const totals = calculateExportTotals(completedRecords);
-    csv += `\nCompleted Trips Summary\n`;
-    csv += `Total Completed Trips:,${completedRecords.length}\n`;
-    csv += `Total Mileage:,"${totals.totalMileage}"\n`;
-    csv += `Total Fuel:,"R${totals.totalFuel}"\n`;
-    csv += `Total Distance:,"${totals.totalDistance}"\n`;
-    
-    downloadCSV(csv, "fleet_life_to_date_complete.csv");
+    csv += `\nSummary\nTotal Completed Trips:,${allCompletedRecords.length}\nCurrently Out:,${allOutRecords.length}\n`;
+    downloadCSV(csv, "fleet_life_to_date.csv");
   }
 
   function exportMonthToDateCSV() {
@@ -881,67 +841,25 @@
     const currentYear = currentDate.getFullYear();
     const monthName = currentDate.toLocaleString('default', { month: 'long' });
     
-    // Get all records from current month (based on check-out date for out records, check-in for completed)
     const monthRecords = [
-      ...outRecords.filter(record => {
-        const recordDate = new Date(record.dateTimeOut);
-        return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
-      }).map(record => ({ 
-        ...record, 
-        status: 'OUT',
-        dateTimeIn: '',
-        mileageIn: 0,
-        fuelAmount: 0,
-        distanceTraveled: 0
-      })),
-      ...completedRecords.filter(record => {
-        const recordDate = new Date(record.dateTimeIn);
-        return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
-      }).map(record => ({ 
-        ...record, 
-        status: 'COMPLETED',
-        distanceTraveled: record.distanceTraveled || 0
-      }))
+      ...allOutRecords.filter(r => { const d = new Date(r.dateTimeOut); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).map(r => ({ ...r, status: 'OUT', dateTimeIn: '' })),
+      ...allCompletedRecords.filter(r => { const d = new Date(r.dateTimeIn); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).map(r => ({ ...r, status: 'COMPLETED' }))
     ];
-    
-    let csv = `Vehicle Reg,Driver,Status,Date Out,Date In,Mileage In,Fuel Amount,Distance Traveled\n`;
-    
-    // Sort by date (newest first)
+    let csv = `Vehicle Reg,Driver,Status,Date Out,Date In\n`;
     monthRecords.sort((a, b) => {
       const dateA = a.status === 'OUT' ? new Date(a.dateTimeOut) : new Date(a.dateTimeIn);
       const dateB = b.status === 'OUT' ? new Date(b.dateTimeOut) : new Date(b.dateTimeIn);
       return dateB - dateA;
     });
-    
     monthRecords.forEach(record => {
       const dateOutFormatted = formatDateTime(record.dateTimeOut);
       const dateInFormatted = record.status === 'COMPLETED' ? formatDateTime(record.dateTimeIn) : 'N/A';
-      const mileage = parseFloat(record.mileageIn || 0).toFixed(1);
-      const fuelAmount = parseFloat(record.fuelAmount || 0).toFixed(2);
-      const distance = parseFloat(record.distanceTraveled || 0).toFixed(1);
-      
-      csv += `"${record.cardRegistration}","${record.driverName}","${record.status}","${dateOutFormatted}","${dateInFormatted}",${mileage},"R${fuelAmount}",${distance}\n`;
+      csv += `"${record.cardRegistration}","${record.driverName}","${record.status}","${dateOutFormatted}","${dateInFormatted}"\n`;
     });
-    
-    // Calculate totals only for completed records in this month
-    const monthCompletedRecords = completedRecords.filter(record => {
-      const recordDate = new Date(record.dateTimeIn);
-      return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
-    });
-    
-    const totals = calculateExportTotals(monthCompletedRecords);
-    csv += `\n${monthName} ${currentYear} Summary\n`;
-    csv += `Current Out:,${outRecords.filter(record => {
-      const recordDate = new Date(record.dateTimeOut);
-      return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
-    }).length}\n`;
-    csv += `Completed Trips:,${monthCompletedRecords.length}\n`;
-    csv += `Total Mileage:,"${totals.totalMileage}"\n`;
-    csv += `Total Fuel:,"R${totals.totalFuel}"\n`;
-    csv += `Total Distance:,"${totals.totalDistance}"\n`;
-    
-    const filename = `fleet_${monthName}_${currentYear}_complete.csv`;
-    downloadCSV(csv, filename);
+    const monthCompleted = allCompletedRecords.filter(r => { const d = new Date(r.dateTimeIn); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+    const monthOut = allOutRecords.filter(r => { const d = new Date(r.dateTimeOut); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+    csv += `\n${monthName} ${currentYear} Summary\nCurrent Out:,${monthOut.length}\nCompleted Trips:,${monthCompleted.length}\n`;
+    downloadCSV(csv, `fleet_${monthName}_${currentYear}.csv`);
   }
 
   function downloadCSV(csvContent, filename) {
@@ -956,14 +874,8 @@
 
   const exportModal = document.getElementById('exportModal');
   document.getElementById('exportCsvBtn').addEventListener('click', () => exportModal.style.display = 'flex');
-  document.getElementById('exportLifeToDateBtn').addEventListener('click', () => {
-    exportModal.style.display = 'none';
-    exportLifeToDateCSV();
-  });
-  document.getElementById('exportMonthToDateBtn').addEventListener('click', () => {
-    exportModal.style.display = 'none';
-    exportMonthToDateCSV();
-  });
+  document.getElementById('exportLifeToDateBtn').addEventListener('click', () => { exportModal.style.display = 'none'; exportLifeToDateCSV(); });
+  document.getElementById('exportMonthToDateBtn').addEventListener('click', () => { exportModal.style.display = 'none'; exportMonthToDateCSV(); });
   document.getElementById('exportCancelBtn').addEventListener('click', () => exportModal.style.display = 'none');
 
   window.addEventListener('click', function(event) {
@@ -990,7 +902,6 @@
 
     await loadFromFirestore();
 
-    // Register Service Worker only if not file://
     if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
       navigator.serviceWorker.register('service-worker.js');
     }
